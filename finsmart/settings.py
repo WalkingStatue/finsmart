@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'accounts.middleware.ProfileCompletionMiddleware',
 ]
 
 ROOT_URLCONF = 'finsmart.urls'
@@ -137,6 +138,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SITE_ID = 1 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
+ACCOUNT_SIGNUP_REDIRECT_URL = 'account:profile_update'
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_REQUIRED = True

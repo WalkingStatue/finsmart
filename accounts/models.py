@@ -8,6 +8,7 @@ from django.db import models
 class Account(models.Model):
     user=models.OneToOneField('auth.User',on_delete=models.CASCADE)
     image=models.ImageField(upload_to='profile_pics',blank=True,null=True)
+    profile_completed = models.BooleanField(default=False)
     on_delete=models.CASCADE
     related_name='account'
 
