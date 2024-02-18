@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'finsmart',
     'accounts',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
 ]
 
@@ -50,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'finsmart.urls'
@@ -126,3 +131,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SITE_ID = 1 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_LOGOUT_REDIRECT = "/"
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+ACCOUNT_USERNAME_MIN_LENGTH = 6
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
