@@ -156,11 +156,13 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+smtp_email = os.environ.get('SMTP_EMAIL')
+smtp_password = os.environ.get('SMTP_PASSWORD')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #new
 EMAIL_HOST = 'smtp.gmail.com' #new
 EMAIL_PORT = 587 #new
-EMAIL_HOST_USER = 'saijadhruv8803@gmail.com'  #new
-EMAIL_HOST_PASSWORD = "pbdiexybcdokapux" #new
+EMAIL_HOST_USER = '{smtp_email}'  #new
+EMAIL_HOST_PASSWORD = '{smtp_password}' #new
 EMAIL_USE_TLS = True #new
 
 STATICFILES_DIRS = [
