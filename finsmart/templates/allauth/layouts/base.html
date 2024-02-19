@@ -1,27 +1,31 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% block head%}{% endblock head%}
         {% block body %}
         
             {% if messages %}
-                <div>
+                <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3">
                     <strong>{% trans "Messages:" %}</strong>
                     <ul>
                         {% for message in messages %}<li>{{ message }}</li>{% endfor %}
                     </ul>
                 </div>
             {% endif %}
-            <div>
+            {% block content %}
+            {% endblock content %}
+            <div class="">
                 <ul>
                     {% if not user.is_authenticated %}
-                        <li>
-                            <a href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
-                        </li>
+                    <div class="mt-4 flex items-center justify-end gap-x-2">
+                            <a href="{% url 'account_login' %}"
+                            class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:ring hover:ring-black h-10 px-4 py-2 duration-200"
+                            >
+                            {% trans "Sign In" %}</a>
+                            <a href="{% url 'account_signup' %}"
+                            class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:ring hover:ring-black h-10 px-4 py-2 duration-200"
+                            >{% trans "Sign Up" %}</a>
+                        </div>
                     {% endif %}
                 </ul>
             </div>
-            {% block content %}
-            {% endblock content %}
         {% endblock body %}

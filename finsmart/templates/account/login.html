@@ -1,0 +1,81 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="flex justify-center mx-auto mt-32">
+  <div class="relative bg-black mt-12 w-full max-w-lg py-5 lg:rounded-xl">
+    <div
+      class="relative -mb-px h-px w-full bg-gradient-to-r from-transparent via-sky-300 to-transparent"
+      bis_skin_checked="1"
+    ></div>
+    <div
+      class="mx-5 border dark:border-b-white/50 dark:border-t-white/50 border-b-white/20 sm:border-t-white/20 shadow-[20px_0_20px_20px] shadow-slate-500/10 dark:shadow-white/20 rounded-lg border-white/20 border-l-white/20 border-r-white/20 sm:shadow-sm lg:rounded-xl lg:shadow-none"
+    >
+      <div class="flex flex-col p-6">
+        <h3 class="text-2xl pb-4 font-semibold leading-6 tracking-tighter text-white">
+          Login
+        </h3>
+        <p class="mt-1.5 text-sm font-medium text-white">
+          Welcome back, enter your credentials to continue.
+        </p>
+      </div>
+      <div class="p-6 pt-0">
+        <form method="post" action="{% url 'account_login' %}">
+          {% csrf_token %}
+          <div>
+            <div>
+              <div
+                class="group relative rounded-lg border focus-within:border-sky-200 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-sky-300/30"
+              >
+                <div class="flex justify-between">
+                  <label
+                    class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400"
+                    >Email</label
+                  >
+                </div>
+                {{ form.login }}
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div>
+              <div
+                class="group relative rounded-lg border focus-within:border-sky-200 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-sky-300/30"
+              >
+                <div class="flex justify-between">
+                  <label
+                    class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400"
+                    >Password</label
+                  >
+                </div>
+                <div class="flex items-center">{{ form.password }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-white">
+            <label class="flex items-center gap-2">
+              <span class="text-xs"></span>
+            </label>
+            <a
+              class="text-sm font-medium text-foreground underline"
+              href="/forgot-password"
+              >Forgot password?</a
+            >
+          </div>
+          <div class="mt-4 flex items-center justify-end gap-x-2">
+            <a
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:ring hover:ring-white h-10 px-4 py-2 duration-200"
+              href="/register"
+              >Register</a
+            >
+            <button
+              class="font-semibold hover:bg-black hover:text-white hover:ring hover:ring-white transition duration-300 inline-flex items-center justify-center rounded-md text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-black h-10 px-4 py-2"
+              type="submit"
+            >
+              Log in
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
