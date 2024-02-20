@@ -156,13 +156,14 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-smtp_email = os.environ.get('SMTP_EMAIL')
-smtp_password = os.environ.get('SMTP_PASSWORD')
+
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #new
 EMAIL_HOST = 'smtp.gmail.com' #new
 EMAIL_PORT = 587 #new
-EMAIL_HOST_USER = '{smtp_email}'  #new
-EMAIL_HOST_PASSWORD = '{smtp_password}' #new
+EMAIL_HOST_USER = os.getenv('SMTP_EMAIL')  # Correct
+EMAIL_HOST_PASSWORD = os.getenv('SMTP_PASSWORD')  # Correct
 EMAIL_USE_TLS = True #new
 
 STATICFILES_DIRS = [
@@ -173,4 +174,6 @@ STATIC_URL = '/static/'
 
 ACCOUNT_FORMS = {
     'login': 'accounts.forms.CustomLoginForm',
+    'signup': 'accounts.forms.CustomSignupForm',
 }
+

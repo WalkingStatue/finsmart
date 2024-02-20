@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% load static %} {% block content %}
+{% extends "base.html" %} {% load i18n %} {% load static %} {% block title %} {%
+trans "Login" %} | FinSmart {% endblock %} {% block content %}
 <div class="flex justify-center mx-auto mt-32">
   <div class="relative bg-black mt-12 w-full max-w-lg py-5 lg:rounded-xl">
     <div
@@ -9,7 +10,9 @@
       class="mx-5 border dark:border-b-white/50 dark:border-t-white/50 border-b-white/20 sm:border-t-white/20 shadow-[20px_0_20px_20px] shadow-slate-500/10 dark:shadow-white/20 rounded-lg border-white/20 border-l-white/20 border-r-white/20 sm:shadow-sm lg:rounded-xl lg:shadow-none"
     >
       <div class="flex flex-col p-6">
-        <h3 class="text-2xl pb-4 font-semibold leading-6 tracking-tighter text-white">
+        <h3
+          class="text-2xl pb-4 font-semibold leading-6 tracking-tighter text-white"
+        >
           Login
         </h3>
         <p class="mt-1.5 text-sm font-medium text-white">
@@ -47,6 +50,19 @@
                 </div>
                 <div class="flex items-center">{{ form.password }}</div>
               </div>
+              <div class="flex justify-between">
+                <label
+                  class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400"
+                >
+                  {% if form.non_field_errors %}
+                  <div class="error-messages">
+                    {% for error in form.non_field_errors %}
+                    <p class="error">{{ error }}</p>
+                    {% endfor %}
+                  </div>  
+                  {% endif %}</label
+                >
+              </div>
             </div>
           </div>
           <div class="mt-4 flex items-center justify-between text-white">
@@ -55,14 +71,14 @@
             </label>
             <a
               class="text-sm font-medium text-foreground underline"
-              href="/forgot-password"
+              href="{% url 'account_reset_password' %}"
               >Forgot password?</a
             >
           </div>
           <div class="mt-4 flex items-center justify-end gap-x-2">
             <a
-              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:ring hover:ring-white h-10 px-4 py-2 duration-200"
-              href="/register"
+              class="text-white inline-flex items-center justify-center rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:ring hover:ring-white h-10 px-4 py-2 duration-200"
+              href="{% url 'account_signup' %}"
               >Register</a
             >
             <button
