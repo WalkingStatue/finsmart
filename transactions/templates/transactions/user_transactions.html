@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+<!-- Adjust according to your base template -->
+
+{% block content %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form method="get">
+  {% csrf_token %} {{ date_range_form.as_p }}
+  <button type="submit">Filter</button>
+</form>
+<h2>Transactions</h2>
+<a href="{% url 'transactions:transaction_add' %}" class="btn btn-primary"
+  >Add New Transaction</a
+>
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Description</th>
+    <th>Amount</th>
+    <th>Type</th>
+  </tr>
+  {% for transaction in object_list %}
+  <tr>
+    <td>{{ transaction.transaction_date }}</td>
+    <td>{{ transaction.description }}</td>
+    <td>{{ transaction.amount }}</td>
+    <td>{{ transaction.get_transaction_type_display }}</td>
+    <td>
+      <a
+        href="{% url 'transactions:transaction_edit' transaction.pk %}"
+        class="btn btn-secondary"
+        >Edit</a
+      >
+      <a
+        href="{% url 'transactions:transaction_delete' transaction.pk %}"
+        class="btn btn-danger"
+        >Delete</a
+      >
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

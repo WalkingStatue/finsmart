@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'finsmart',
     'accounts',
+    #'transactions',
+    'transactions.apps.TransactionsConfig',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

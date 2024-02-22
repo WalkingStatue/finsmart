@@ -19,12 +19,14 @@ from django.urls import path
 from django.conf.urls import include
 from django.conf.urls.static import static
 from accounts import urls as account_urls
+from transactions import urls as transaction_urls
 from django.conf import settings
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("",include(account_urls,namespace="account")),
+    path("transactions/",include(transaction_urls,namespace="transactions")),
     
     path("", include("allauth.urls")),
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

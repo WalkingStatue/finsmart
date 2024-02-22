@@ -1,0 +1,11 @@
+{% extends 'base.html' %} <!-- Adjust this to extend from your base template -->
+
+{% block content %}
+  <h2>{% if object %}Edit Transaction{% else %}Add Transaction{% endif %}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+    <a href="{% url 'transactions:user_transactions' %}">Cancel</a> <!-- Adjust the URL name based on your actual URL configuration -->
+  </form>
+{% endblock %}

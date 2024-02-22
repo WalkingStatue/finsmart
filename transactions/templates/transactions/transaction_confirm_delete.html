@@ -1,0 +1,10 @@
+{% extends 'base.html' %} <!-- Adjust this to extend from your base template -->
+
+{% block content %}
+  <h2>Are you sure you want to delete this transaction?</h2>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete it</button>
+    <a href="{% url 'transactions:user_transactions' %}">Cancel</a> <!-- Adjust the URL name based on your actual URL configuration -->
+  </form>
+{% endblock %}
