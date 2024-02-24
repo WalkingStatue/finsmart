@@ -48,6 +48,7 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
+    
 
 
 class TransactionUpdateView(LoginRequiredMixin, UpdateView):

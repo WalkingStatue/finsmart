@@ -21,7 +21,7 @@ from .models import Transaction
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['wallet', 'transaction_type', 'amount', 'description', 'category', 'transaction_date']
+        fields = ['wallet', 'transaction_type', 'amount', 'description', 'category']
         
     def __init__(self, *args, user=None, **kwargs):
         super(TransactionForm, self).__init__(*args, **kwargs)

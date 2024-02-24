@@ -1,6 +1,6 @@
 {% extends 'base.html' %} 
 {% block title %} Profile | FinSmart {% endblock %} 
-{% block content %}
+{%  block content %}
 <div class="flex justify-center mx-auto mt-20">
   <div class="relative bg-black mt-12 w-full max-w-lg py-5 lg:rounded-xl">
     <div
@@ -67,28 +67,28 @@
             </div>
           </div>
           <div
-                class="mb-4 text-white block group relative rounded-lg border focus-within:border-sky-200 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-sky-300/30"
-              >
-          <label
-            for="id_image"
-            class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400"
-            >Profile Image:</label
+            class="mb-4 text-white block group relative rounded-lg border focus-within:border-sky-200 px-3 pb-1.5 pt-2.5 duration-200 focus-within:ring focus-within:ring-sky-300/30"
           >
-          <input type="file" name="image" id="id_image" accept="image/*" />
-          {% if account_form.instance.image %}
-          <img
-            class="block my-5"
-            src="{{ account_form.instance.image.url }}"
-            alt="Profile Image"
-            style="width: 100px; height: auto"
-          />
-          {% endif %}
-          <button
-            class="font-semibold hover:bg-black hover:text-white hover:ring hover:ring-white transition duration-300 inline-flex items-center justify-center rounded-md text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-black h-10 px-4 py-2"
-            type="submit"
-          >
-            Save Changes
-          </button>
+            <label
+              for="id_image"
+              class="text-xs font-medium text-muted-foreground group-focus-within:text-white text-gray-400"
+              >Profile Image:</label
+            >
+            <input
+              class="block w-full text-white border-0 bg-transparent p-0 text-sm file:my-1 file:rounded-full file:border-0 file:bg-accent file:px-4 file:py-2 file:font-medium placeholder:text-muted-foreground/90 focus:outline-none focus:ring-0 sm:leading-7 text-foreground rounded-lg"
+              type="file"
+              name="image"
+              id="id_image"
+              accept="image/*"
+            />
+          </div>
+          <div class="flex justify-end">
+            <button
+              class="font-semibold hover:bg-black hover:text-white hover:ring hover:ring-white transition duration-300 inline-flex items-center justify-center rounded-md text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-black h-10 px-4 py-2"
+              type="submit"
+            >
+              Save Changes
+            </button>
           </div>
         </form>
       </div>

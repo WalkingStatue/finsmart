@@ -179,3 +179,5 @@ ACCOUNT_FORMS = {
     'signup': 'accounts.forms.CustomSignupForm',
 }
 
+USE_TZ = True
+TIME_ZONE = 'Asia/Kolkata'

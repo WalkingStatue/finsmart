@@ -2,6 +2,10 @@ from django.db import models
 from django.conf import settings
 from accounts.models import Account
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+
+now = timezone.now()  # This is timezone-aware and set to 'Asia/Kolkata'
+
 
 class Wallet(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='wallets')
@@ -34,7 +38,7 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.CharField(max_length=255)
     category = models.ForeignKey(Category, related_name='transactions', on_delete=models.SET_NULL, null=True, blank=True)
-    transaction_date = models.DateTimeField()
+    transaction_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.wallet} - {self.amount} - {self.description}"

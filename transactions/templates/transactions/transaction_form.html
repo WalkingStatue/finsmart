@@ -1,11 +1,104 @@
-{% extends 'base.html' %} <!-- Adjust this to extend from your base template -->
+{% extends 'base.html' %}
+<!-- Adjust this to extend from your base template -->
 
 {% block content %}
-  <h2>{% if object %}Edit Transaction{% else %}Add Transaction{% endif %}</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-    <a href="{% url 'transactions:user_transactions' %}">Cancel</a> <!-- Adjust the URL name based on your actual URL configuration -->
-  </form>
+<h2>{% if object %}Edit Transaction{% else %}Add Transaction{% endif %}</h2>
+
+<form method="post" action="">
+  {% csrf_token %}
+
+  <p>
+    <label
+      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      for="id_wallet"
+      >Wallet:</label
+    >
+    <select
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      name="wallet"
+      id="id_wallet"
+    >
+      {% for wallet in form.fields.wallet.queryset %} 
+      <option value="{{wallet.id }}"{% if form.fields.wallet.value == wallet.id %}selected{% endif %}>{{ wallet.name }} {% endfor %}</option>
+    </select>
+  </p>
+
+  <p>
+    <label
+      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      for="id_transaction_type"
+      >Transaction Type:</label
+    >
+    <select
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      name="transaction_type"
+      id="id_transaction_type"
+    >
+      {% for choice in form.fields.transaction_type.choices %} 
+      <option value="{{choice.0 }}"{% if form.fields.transaction_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }} {% endfor %}</option>
+    </select>
+  </p>
+
+  <p>
+    <label
+      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      for="id_amount"
+      >Amount:</label
+    >
+    <input
+      type="text"
+      name="amount"
+      id="id_amount"
+      value="{{ form.fields.amount.value }}"
+    />
+  </p>
+
+  <p>
+    <label
+      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      for="id_description"
+      >Description:</label
+    >
+    <input
+      type="text"
+      name="description"
+      id="id_description"
+      value="{{ form.fields.description.value }}"
+    />
+  </p>
+
+  <p>
+    <label
+      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      for="id_category"
+      >Category:</label
+    >
+    <select
+      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      name="category"
+      id="id_category"
+    >
+      <option value="">No Category</option>
+      {% for category in form.fields.category.queryset %} 
+      <option value="{{category.id }}"{% if form.fields.category.value == category.id %}selected{% endif %}>{{ category.name }} {% endfor %} </option>
+    </select>
+  </p>
+
+  <button type="submit">Save</button>
+  <a href="{% url 'transactions:user_transactions' %}">Cancel</a>
+  <!-- Adjust the URL name based on your actual URL configuration -->
+</form>
+{% if form.non_field_errors %}
+  <div class="errors">{{ form.non_field_errors }}</div>
+{% endif %}
+
+{% for field in form %}
+  <div>
+    
+    {% if field.errors %}
+      <div class="errors">{{ field.label_tag }}{{ field.errors }}</div>
+    {% endif %}
+  </div>
+{% endfor %}
+
 {% endblock %}
