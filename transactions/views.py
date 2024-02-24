@@ -1,14 +1,21 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.core.exceptions import ValidationError
 from django.views.generic.list import ListView
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 from .forms import TransactionForm
 from .forms import DateRangeForm
 from django.http import Http404
 from .models import Transaction
 
+
+
+
+
+from django.shortcuts import get_object_or_404
 
 class UserTransactionsView(LoginRequiredMixin, ListView):
     model = Transaction

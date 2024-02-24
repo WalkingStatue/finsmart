@@ -4,22 +4,24 @@
 {% block head_title %}
     {% trans "Verify Your Email Address" %}
 {% endblock head_title %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Verify Your Email Address" %}
-    {% endelement %}
-    {% url 'account_email' as email_url %}
-    <p>
-        {% blocktrans %}This part of the site requires us to verify that
-you are who you claim to be. For this purpose, we require that you
-verify ownership of your email address. {% endblocktrans %}
-    </p>
-    <p>
-        {% blocktrans %}We have sent an email to you for
-verification. Please click on the link inside that email. If you do not see the verification email in your main inbox, check your spam folder. Otherwise
-contact us if you do not receive it within a few minutes.{% endblocktrans %}
-    </p>
-    <p>
-        {% blocktrans %}<strong>Note:</strong> you can still <a href="{{ email_url }}">change your email address</a>.{% endblocktrans %}
-    </p>
+<div class="py-12 bg-gray-100 min-h-screen flex flex-col justify-center sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h1 class="text-center text-3xl font-extrabold text-gray-900">
+            {% trans "Verify Your Email Address" %}
+        </h1>
+        <div class="mt-8 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <p class="mb-4 text-sm text-gray-600">
+                {% trans "This part of the site requires us to verify that you are who you claim to be. For this purpose, we require that you verify ownership of your email address." %}
+            </p>
+            <p class="mb-4 text-sm text-gray-600">
+                {% trans "We have sent an email to you for verification. Please click on the link inside that email. If you do not see the verification email in your main inbox, check your spam folder. Otherwise, contact us if you do not receive it within a few minutes." %}
+            </p>
+            <p class="text-sm text-gray-600">
+                {% trans "Note: you can still" %} <a href="{{ email_url }}" class="font-medium text-indigo-600 hover:text-indigo-500">{% trans "change your email address" %}</a>.
+            </p>
+        </div>
+    </div>
+</div>
 {% endblock content %}
