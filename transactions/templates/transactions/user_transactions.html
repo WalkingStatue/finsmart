@@ -1,80 +1,105 @@
 {% extends "base.html" %}
+{% load humanize %}
 <!-- Adjust according to your base template -->
 
 {% block content %}
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    {% if messages %}
-        <div class="mb-4">
-            {% for message in messages %}
-                <div class="{{ message.tags }} p-4 mb-4 text-sm rounded-lg" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 p-4">
-        <h2 class="text-lg leading-6 font-medium text-gray-900 mb-4">Filter Transaction</h2>
-        <form method="get" action="">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                <div>
-                    <label for="id_start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                    <input type="date" name="start_date" id="id_start_date" value="{{ date_range_form.start_date.value|date:'Y-m-d' }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <label for="id_end_date" class="block text-sm font-medium text-gray-700">End Date</label>
-                    <input type="date" name="end_date" id="id_end_date" value="{{ date_range_form.end_date.value|date:'Y-m-d' }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                </div>
-                <div>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Filter
-                    </button>
-                </div>
-            </div>
-        </form>
+  <!-- Wallets Display -->
+  <div class="flex gap-4 mb-6">
+    {% for wallet in wallets %}
+    <div class="bg-gray-900 rounded-xl p-6 flex flex-col items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+      <span class="text-blue-400 text-lg font-semibold">{{ wallet.name }}</span>
+      <span class="text-white text-2xl font-bold">₹{{ wallet.balance|intcomma }}</span>
+      <span class="text-gray-500 text-sm">{{ wallet.transactions.count }} transaction{% if wallet.transactions.count != 1 %}s{% endif %}</span>
     </div>
+    {% endfor %}
+    <!-- Add Wallet Button -->
+    <a href="{% url 'transactions:add_wallet' %}" class="bg-gray-900 rounded-xl p-6 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+    </a>
+  </div>
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <h2 class="text-lg leading-6 font-medium text-gray-900">Transactions</h2>
-            <a href="{% url 'transactions:transaction_add' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Add New Transaction
-            </a>
+  <!-- Filter Transaction Block -->
+  <div class="bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-6 p-6">
+    <h2 class="text-xl leading-6 font-medium text-white mb-4">
+      Filter Transaction
+    </h2>
+    <form method="get" action="" class="text-white">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        <div>
+          <label for="id_start_date" class="block text-sm font-medium text-gray-400">Start Date</label>
+          <input type="date" name="start_date" id="id_start_date" value="{{ date_range_form.start_date.value|date:'Y-m-d' }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 rounded-md bg-gray-800 text-white"/>
         </div>
-        <div class="border-t border-gray-200">
-            <table class="w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for transaction in object_list %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ transaction.transaction_date|date:"Y-m-d H:i" }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.description }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.amount }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.get_transaction_type_display }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{% url 'transactions:transaction_edit' transaction.pk %}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                            <a href="{% url 'transactions:transaction_delete' transaction.pk %}" class="text-red-600 hover:text-red-900 ml-4" >Delete</a>
+        <div>
+          <label for="id_end_date" class="block text-sm font-medium text-gray-400">End Date</label>
+          <input type="date" name="end_date" id="id_end_date" value="{{ date_range_form.end_date.value|date:'Y-m-d' }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-700 rounded-md bg-gray-800 text-white"/>
+        </div>
+        <div>
+          <button type="submit" class="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Filter
+            <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-1zm0 6a1 1 0 011-1h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-1z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
 
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No transactions found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <!-- Transactions Table -->
+  <div class="bg-gray-900 shadow overflow-hidden sm:rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <h2 class="text-xl leading-6 font-medium text-white">Transactions</h2>
+      <a href="{% url 'transactions:transaction_add' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        Add New Transaction
+        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </a>
     </div>
+    <div class="border-t border-gray-700">
+<table class="w-full divide-y divide-gray-700">
+    <thead class="bg-gray-800 text-white">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Description</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Type</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Category</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th> <!-- New Date column -->
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Amount</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-gray-800 divide-y divide-gray-700 text-white">
+      {% for transaction in object_list %}
+      <tr class="hover:bg-gray-700">
+        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ transaction.description }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ transaction.get_transaction_type_display }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          {{ transaction.category.name|default:"N/A" }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">{{ transaction.transaction_date|date:"Y-m-d" }}</td> <!-- Displaying Date -->
+        <td class="px-6 py-4 whitespace-nowrap text-sm {% if transaction.transaction_type == 'debit' %}text-red-500{% elif transaction.transaction_type == 'credit' %}text-green-500{% endif %}">
+          {{ transaction.amount }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <a href="{% url 'transactions:transaction_edit' transaction.pk %}" class="text-blue-500 hover:text-blue-400">Edit</a>
+          <a href="{% url 'transactions:transaction_delete' transaction.pk %}" class="text-red-500 hover:text-red-400 ml-4">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="px-6 py-4 text-center text-sm">No transactions found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+    </div>
+  </div>
 </div>
-
-
 {% endblock %}

@@ -13,11 +13,6 @@ class WalletForm(forms.ModelForm):
         model = Wallet
         fields = ['name', 'balance']
 
-
-
-from django import forms
-from .models import Transaction
-
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction

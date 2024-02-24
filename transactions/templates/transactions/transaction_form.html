@@ -2,89 +2,91 @@
 <!-- Adjust this to extend from your base template -->
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">
+<div class="max-w-4xl mt-5 mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 rounded-lg shadow">
+    <h2 class="text-3xl font-semibold text-gray-100">
         {% if object %}Edit Transaction{% else %}Add Transaction{% endif %}
     </h2>
 
-    <form method="post" action="" class="mt-8 space-y-6">
+    <form method="post" action="" class="mt-8 space-y-8 divide-y divide-gray-700">
         {% csrf_token %}
 
-        <div class="shadow overflow-hidden rounded-md">
-            <div class="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6">
-                <div class="grid grid-cols-6 gap-6">
+        <div class="space-y-8 divide-y divide-gray-700">
+            <div class="space-y-8 divide-y divide-gray-700 sm:space-y-5">
+                <div>
+                    <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <!-- Wallet Field -->
+                        <div class="sm:col-span-3">
+                            <label for="id_wallet" class="block text-sm font-medium text-gray-300">Wallet</label>
+                            <select id="id_wallet" name="wallet" required class="mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                {% for wallet in form.fields.wallet.queryset %}
+                                <option value="{{ wallet.id }}" {% if form.fields.wallet.value == wallet.id %} selected {% endif %}>
+                                    {{ wallet.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                    <!-- Wallet Field -->
-                    <div class="col-span-6 sm:col-span-3">
-                        <label for="id_wallet" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Wallet</label>
-                        <select id="id_wallet" name="wallet" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            {% for wallet in form.fields.wallet.queryset %}
-                            <option value="{{ wallet.id }}" {% if form.fields.wallet.value == wallet.id %} selected {% endif %}>
-                                {{ wallet.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <!-- Transaction Type Field -->
+                        <div class="sm:col-span-3">
+                            <label for="id_transaction_type" class="block text-sm font-medium text-gray-300">Transaction Type</label>
+                            <select id="id_transaction_type" name="transaction_type" required class="mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                {% for choice in form.fields.transaction_type.choices %}
+                                <option value="{{ choice.0 }}" {% if form.fields.transaction_type.value == choice.0 %} selected {% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Amount Field -->
+                        <div class="sm:col-span-6">
+                            <label for="id_amount" class="block text-sm font-medium text-gray-300">Amount</label>
+                            <input type="number" name="amount" id="id_amount" required value="{{ form.fields.amount.value }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-600 bg-gray-700 text-white rounded-md">
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="sm:col-span-6">
+                            <label for="id_description" class="block text-sm font-medium text-gray-300">Description</label>
+                            <input type="text" name="description" id="id_description" required value="{{ form.fields.description.value }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-600 bg-gray-700 text-white rounded-md">
+                        </div>
+
+                        <!-- Category Field -->
+                        <div class="sm:col-span-6">
+                            <label for="id_category" class="block text-sm font-medium text-gray-300">Category</label>
+                            <select id="id_category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">No Category</option>
+                                {% for category in form.fields.category.queryset %}
+                                <option value="{{ category.id }}" {% if form.fields.category.value == category.id %} selected {% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-
-                    <!-- Transaction Type Field -->
-                    <div class="col-span-6 sm:col-span-3">
-                        <label for="id_transaction_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Transaction Type</label>
-                        <select id="id_transaction_type" name="transaction_type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            {% for choice in form.fields.transaction_type.choices %}
-                            <option value="{{ choice.0 }}" {% if form.fields.transaction_type.value == choice.0 %} selected {% endif %}>
-                                {{ choice.1 }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- Amount Field -->
-                    <div class="col-span-6">
-                        <label for="id_amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount</label>
-                        <input type="text" name="amount" id="id_amount" value="{{ form.fields.amount.value }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-
-                    <!-- Description Field -->
-                    <div class="col-span-6">
-                        <label for="id_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                        <input type="text" name="description" id="id_description" value="{{ form.fields.description.value }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-
-                    <!-- Category Field -->
-                    <div class="col-span-6">
-                        <label for="id_category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                        <select id="id_category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">No Category</option>
-                            {% for category in form.fields.category.queryset %}
-                            <option value="{{ category.id }}" {% if form.fields.category.value == category.id %} selected {% endif %}>
-                                {{ category.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
                 </div>
             </div>
+        </div>
 
-            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Save
-                </button>
-                <a href="{% url 'transactions:user_transactions' %}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <div class="pt-5">
+            <div class="flex justify-end">
+                <a href="{% url 'transactions:user_transactions' %}" class="py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     Cancel
                 </a>
+                <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Save
+                </button>
             </div>
         </div>
 
         {% if form.non_field_errors %}
-        <div class="rounded-md bg-red-50 p-4">
+        <div class="rounded-md bg-red-600 p-4 mt-5">
             <div class="flex">
                 <div class="flex-shrink-0">
                     <!-- Icon -->
                 </div>
                 <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">There was a problem.</h3>
-                    <div class="mt-2 text-sm text-red-700">
+                    <h3 class="text-sm font-medium text-white">There was a problem.</h3>
+                    <div class="mt-2 text-sm text-red-100">
                         <ul role="list" class="list-disc pl-5 space-y-1">
                             {% for error in form.non_field_errors %}
                             <li>{{ error }}</li>

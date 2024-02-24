@@ -1,21 +1,16 @@
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from .forms import TransactionForm, DateRangeForm, WalletForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 from django.views.generic.list import ListView
+from django.shortcuts import get_object_or_404
+from .models import Transaction, Wallet
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from .forms import TransactionForm
-from .forms import DateRangeForm
 from django.http import Http404
-from .models import Transaction
-
-
-
-
-
-from django.shortcuts import get_object_or_404
+  # Assuming you have a Wallet model
 
 class UserTransactionsView(LoginRequiredMixin, ListView):
     model = Transaction
@@ -37,8 +32,8 @@ class UserTransactionsView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['date_range_form'] = DateRangeForm(self.request.GET or None)  # Pass initial data to the form
+        context['wallets'] = Wallet.objects.filter(account__user=self.request.user)
         return context
-
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
@@ -55,9 +50,6 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-    
-
-
 class TransactionUpdateView(LoginRequiredMixin, UpdateView):
     model = Transaction
     form_class = TransactionForm
@@ -71,7 +63,6 @@ class TransactionUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         """Redirect to the transactions list page after a successful update."""
         return reverse_lazy('transactions:user_transactions')
-
 
 class TransactionDeleteView(LoginRequiredMixin, DeleteView):
     model = Transaction
@@ -95,3 +86,44 @@ class TransactionDeleteView(LoginRequiredMixin, DeleteView):
         except ValidationError as e:
             # If a ValidationError is raised, return to the previous page and show an error message
             return render(request, 'transactions/transaction_confirm_delete.html', {'error': e.message, 'object': self.object})
+
+class WalletCreateView(LoginRequiredMixin, CreateView):
+    model = Wallet
+    form_class = WalletForm
+    template_name = 'wallets/add_wallet.html'
+    success_url = reverse_lazy('transactions:user_transactions')  # Adjust this to your wallet listing URL name
+
+    def form_valid(self, form):
+        # Assuming each User has one associated Account accessible via user.account
+        form.instance.account = self.request.user
+        return super().form_valid(form)
+
+class WalletUpdateView(LoginRequiredMixin, UpdateView):
+    model = Wallet
+    form_class = WalletForm
+    template_name = 'wallets/update_wallet.html'
+    success_url = reverse_lazy('transactions:user_transactions')  # Adjust this to your wallet listing URL name
+
+    def get_queryset(self):
+        queryset = Wallet.objects.filter(account__user=self.request.user)
+        return queryset
+
+class WalletDeleteView(LoginRequiredMixin, DeleteView):
+    model = Wallet
+    template_name = 'wallets/delete_wallet.html'
+    success_url = reverse_lazy('transactions:user_transactions')  # Adjust this to your wallet listing URL name
+
+    def get_queryset(self):
+        queryset = Wallet.objects.filter(account__user=self.request.user)
+        return queryset
+
+from django.views.generic import ListView
+from .models import Wallet
+
+class WalletListView(LoginRequiredMixin, ListView):
+    model = Wallet
+    template_name = 'wallets/wallet_list.html'
+
+    def get_queryset(self):
+        queryset = Wallet.objects.filter(account__user=self.request.user)
+        return queryset

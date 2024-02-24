@@ -3,6 +3,7 @@ from .models import Account
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import TemplateView
 from django.views.generic.base import TemplateResponseMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import UserForm, AccountForm
@@ -47,3 +48,11 @@ class ProfileUpdateView(LoginRequiredMixin, TemplateResponseMixin, View):
             return redirect(self.success_url)
 
         return self.render_to_response({'user_form': user_form, 'account_form': account_form})
+
+
+class ProfileSettingsView(LoginRequiredMixin, TemplateView):
+    template_name = 'accounts/profile_settings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
