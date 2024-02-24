@@ -124,6 +124,7 @@ class WalletListView(LoginRequiredMixin, ListView):
     model = Wallet
     template_name = 'wallets/wallet_list.html'
 
-    def get_queryset(self):
-        queryset = Wallet.objects.filter(account__user=self.request.user)
-        return queryset
+    def get_context_data(self, **kwargs):
+        context = super(WalletListView, self).get_context_data(**kwargs)
+        context['wallets'] = Wallet.objects.filter(account__user=self.request.user)
+        return context

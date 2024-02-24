@@ -1,12 +1,13 @@
-from django.views.generic import ListView
-from .models import Account
+from django.views.generic.base import TemplateResponseMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView,ListView
+from .forms import UserForm, AccountForm
+from transactions.models import Wallet
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView
-from django.views.generic.base import TemplateResponseMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import UserForm, AccountForm
+from .models import Account
+
 
 class HomePageView(ListView):
     model = Account
@@ -54,5 +55,6 @@ class ProfileSettingsView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/profile_settings.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(ProfileSettingsView, self).get_context_data(**kwargs)
+        context['wallets'] = Wallet.objects.filter(account__user=self.request.user)
         return context

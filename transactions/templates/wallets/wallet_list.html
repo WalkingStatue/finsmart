@@ -5,7 +5,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
         <h2 class="text-3xl font-semibold text-white mb-6">Your Wallets</h2>
             <ul class="space-y-4">
-                {% for wallet in object_list %}
+                {% for wallet in wallets %}
                 <li class="flex justify-between items-center bg-gray-700 p-4 rounded-md">
                     <span class="text-white font-medium">{{ wallet.name }}</span>
                     <div>
