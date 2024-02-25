@@ -95,7 +95,7 @@ class WalletCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         # Assuming each User has one associated Account accessible via user.account
-        form.instance.account = self.request.user
+        form.instance.account = self.request.user.account
         return super().form_valid(form)
 
 class WalletUpdateView(LoginRequiredMixin, UpdateView):
