@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen pt-10">
+    <div class="container mx-auto max-w-md rounded-lg overflow-hidden">
+        <div class="bg-gray-800 px-6 py-8">
+            <h2 class="text-2xl font-bold mb-4 text-white text-center">Delete Category</h2>
+            <p class="text-white">Are you sure you want to delete "{{ category.name }}" category?</p>
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mt-4">Confirm Delete</button>
+            </form>
+            <a href="{% url 'transactions:category_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mt-4 ml-2">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

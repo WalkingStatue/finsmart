@@ -1,3 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.active-wallet {
+    border: 2px solid #4A90E2; /* A blue border, for instance */
+    box-shadow: 0 0 10px #4A90E2; /* Optional: add a glow effect */
+}

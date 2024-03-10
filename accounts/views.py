@@ -2,7 +2,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView,ListView
 from .forms import UserForm, AccountForm
-from transactions.models import Wallet
+from transactions.models import Wallet, Category
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -57,4 +57,5 @@ class ProfileSettingsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProfileSettingsView, self).get_context_data(**kwargs)
         context['wallets'] = Wallet.objects.filter(account__user=self.request.user)
+        context['categories'] = Category.objects.filter(account__user=self.request.user)
         return context

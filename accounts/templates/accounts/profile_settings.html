@@ -1,110 +1,240 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="pt-10 flex justify-center">
+{% extends 'base.html' %} {% block content %}
+<div class="min-h-screen pt-10 text-white">
   <div class="container mx-auto flex">
-    <!-- Tabs (Sidebar) -->
-    <div class="flex flex-col w-1/4 bg-gray-800 p-4 rounded-lg shadow-lg">
-      <a class="py-2 px-4 text-white font-semibold hover:bg-gray-700 cursor-pointer" id="profile-tab">Profile</a>
-      <a class="py-2 px-4 text-white font-semibold hover:bg-gray-700 cursor-pointer mt-4" id="wallets-tab">Wallets</a>
+    <!-- Sidebar -->
+    <div class="w-1/4 bg-gray-800 p-4 rounded-lg shadow-lg">
+      <a
+        href="#"
+        class="py-2 px-4 text-white font-semibold hover:bg-gray-700 cursor-pointer block mb-4"
+        data-tab="profile"
+        >Profile</a
+      >
+      <a
+        href="#"
+        class="py-2 px-4 text-white font-semibold hover:bg-gray-700 cursor-pointer block mb-4"
+        data-tab="wallets"
+        >Wallets</a
+      >
+      <a
+        href="#"
+        class="py-2 px-4 text-white font-semibold hover:bg-gray-700 cursor-pointer block mb-4"
+        data-tab="categories"
+        >Categories</a
+      >
     </div>
-    <!-- Tab Contents -->
+    <!-- Main Content -->
     <div class="ml-8 flex-grow">
-      <div class="tab-content bg-gray-800 p-6 rounded-lg shadow-lg" id="profile-content">
-        <!-- Profile Content Here -->
-        <div class="max-w-md w-full bg-gray-700 rounded-lg shadow-lg py-8 px-6">
-          <h2 class="text-2xl font-semibold leading-6 text-white text-center mb-6">Complete Your Profile</h2>
-          <form method="post" enctype="multipart/form-data" class="space-y-4">
-            {% csrf_token %}
-            {% for error in form.errors %}
-            <p class="text-red-500 text-xs italic">{{ error }}</p>
-            {% endfor %}
-            
-            <!-- First Name Field -->
-            <div class="mb-4">
-              <label for="id_first_name" class="block text-sm font-medium text-gray-300">First Name</label>
-              <input type="text" name="first_name" id="id_first_name" class="mt-1 block w-full rounded-md bg-gray-800 border-transparent focus:border-sky-500 focus:ring-sky-500 text-white" required value="{{ user_form.instance.first_name }}">
-            </div>
-            
-            <!-- Last Name Field -->
-            <div class="mb-4">
-              <label for="id_last_name" class="block text-sm font-medium text-gray-300">Last Name</label>
-              <input type="text" name="last_name" id="id_last_name" class="mt-1 block w-full rounded-md bg-gray-800 border-transparent focus:border-sky-500 focus:ring-sky-500 text-white" required value="{{ user_form.instance.last_name }}">
-            </div>
-            
-            <!-- Profile Image Upload -->
-            <div class="mb-4">
-              <label for="id_image" class="block text-sm font-medium text-gray-300">Profile Image</label>
-              <input type="file" name="image" id="id_image" class="mt-1 block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600" accept="image/*">
-            </div>
-            
-            <!-- Submit Button -->
-            <div class="flex justify-end">
-              <button type="submit" class="inline-flex items-center justify-center rounded-md bg-sky-500 text-white font-semibold hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 px-4 py-2">Save Changes</button>
-            </div>
-          </form>
-        </div>
-      </div>
-      <div class="tab-content hidden bg-gray-800 p-6 rounded-lg shadow-lg mt-6" id="wallets-content">
-        <!-- Wallets Content Here -->
-        <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
-          <h2 class="text-3xl font-semibold text-white mb-6">Your Wallets</h2>
-          <ul class="space-y-4">
-            {% for wallet in wallets %}
-            <li class="flex justify-between items-center bg-gray-800 p-4 rounded-md">
-              <span class="text-white font-medium">{{ wallet.name }}</span>
-              <div>
-                <a href="{% url 'transactions:update_wallet' pk=wallet.pk %}"
-                  class="text-sm bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out mr-2">
-                  Update
-                </a>
-                <a href="{% url 'transactions:delete_wallet' pk=wallet.pk %}"
-                  class="text-sm bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out">
-                  Delete
-                </a>
+      <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <div class="tab-content" id="profile-content">
+          <!-- Profile Content Here -->
+          <div
+            class="max-w-md w-full bg-gray-700 rounded-lg shadow-lg py-8 px-6"
+          >
+            <h2
+              class="text-2xl font-semibold leading-6 text-white text-center mb-6"
+            >
+              Complete Your Profile
+            </h2>
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+              {% csrf_token %} {% for error in form.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+              <div class="mb-4">
+                <label
+                  for="id_first_name"
+                  class="block text-sm font-medium text-gray-300"
+                  >First Name</label
+                >
+                <input
+                  type="text"
+                  name="first_name"
+                  id="id_first_name"
+                  class="mt-1 block w-full rounded-md bg-gray-800 border-transparent focus:border-sky-500 focus:ring-sky-500 text-white"
+                  required
+                  value="{{ user_form.instance.first_name }}"
+                />
               </div>
-            </li>
-            {% empty %}
-            <li class="text-white text-center">
-              No wallets available.
-            </li>
-            {% endfor %}
-          </ul>
+              <div class="mb-4">
+                <label
+                  for="id_last_name"
+                  class="block text-sm font-medium text-gray-300"
+                  >Last Name</label
+                >
+                <input
+                  type="text"
+                  name="last_name"
+                  id="id_last_name"
+                  class="mt-1 block w-full rounded-md bg-gray-800 border-transparent focus:border-sky-500 focus:ring-sky-500 text-white"
+                  required
+                  value="{{ user_form.instance.last_name }}"
+                />
+              </div>
+              <div class="mb-4">
+                <label
+                  for="id_image"
+                  class="block text-sm font-medium text-gray-300"
+                  >Profile Image</label
+                >
+                <input
+                  type="file"
+                  name="image"
+                  id="id_image"
+                  class="mt-1 block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600"
+                  accept="image/*"
+                />
+              </div>
+              <div class="flex justify-end">
+                <button
+                  type="submit"
+                  class="inline-flex items-center justify-center rounded-md bg-sky-500 text-white font-semibold hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 px-4 py-2"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="tab-content hidden" id="wallets-content">
+          <!-- Wallets Content Here -->
+         <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+    <h2 class="text-3xl font-semibold text-white mb-6">Your Wallets</h2>
+    <ul class="space-y-4">
+        {% for wallet in wallets %}
+        <li class="flex justify-between items-center bg-gray-800 p-4 rounded-md transition duration-300 ease-in-out hover:bg-gray-700">
+            <span class="text-white font-medium">{{ wallet.name }}</span>
+            <div>
+                <a href="{% url 'transactions:update_wallet' pk=wallet.pk %}" class="text-sm bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out mr-2 inline-flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-1.688 1.688m-2.651-2.652l-8.168 8.17m0 0L6.75 14.25l2.475-.525m-2.475.525l.525 2.475 8.168-8.169m0 0l2.651-2.651M3 21h18" />
+                    </svg>
+                    Edit
+                </a>
+                <a href="{% url 'transactions:delete_wallet' pk=wallet.pk %}" class="text-sm bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out inline-flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.166L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.426m-11 .426c.342-.059.682-.114 1.022-.166m0 0a48.257 48.257 0 013.456-.426M6 5.75V4.5A1.5 1.5 0 017.5 3h9A1.5 1.5 0 0118 4.5v1.25m-12 0h12"/>
+                    </svg>
+                    Delete
+                </a>
+            </div>
+        </li>
+        {% empty %}
+        <li class="text-white text-center">
+            No wallets available.
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+        </div>
+        <div class="tab-content hidden" id="categories-content">
+          <!-- Categories Content Here -->
+          <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-semibold text-white mb-6">Categories</h2>
+            <a
+              href="{% url 'transactions:add_category' %}"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6 inline-block text-center transition duration-300 ease-in-out"
+              >Add Category</a
+            >
+            <ul class="space-y-4">
+              {% for category in categories %}
+              <li
+                class="flex justify-between items-center bg-gray-800 p-4 rounded-md transition duration-300 ease-in-out hover:bg-gray-700"
+              >
+                <span class="text-white font-medium">{{ category.name }}</span>
+                <div>
+                  <a
+                    href="{% url 'transactions:update_category' pk=category.pk %}"
+                    class="text-sm bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out mr-2 inline-flex items-center justify-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-4 h-4 mr-1"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-1.688 1.688m-2.651-2.652l-8.168 8.17m0 0L6.75 14.25l2.475-.525m-2.475.525l.525 2.475 8.168-8.169m0 0l2.651-2.651M3 21h18"
+                      />
+                    </svg>
+                    Edit
+                  </a>
+                  <a
+                    href="{% url 'transactions:delete_category' pk=category.pk %}"
+                    class="text-sm bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out inline-flex items-center justify-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-4 h-4 mr-1"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.166L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.426m-11 .426c.342-.059.682-.114 1.022-.166m0 0a48.257 48.257 0 013.456-.426M6 5.75V4.5A1.5 1.5 0 017.5 3h9A1.5 1.5 0 0118 4.5v1.25m-12 0h12"
+                      />
+                    </svg>
+                    Delete
+                  </a>
+                </div>
+              </li>
+              {% empty %}
+              <li class="text-white text-center">No categories found.</li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".flex-col > a");
-  const profileContent = document.querySelector("#profile-content");
-  const walletsContent = document.querySelector("#wallets-content");
+  document.addEventListener("DOMContentLoaded", () => {
+    const tabs = document.querySelectorAll("[data-tab]");
+    const tabContents = document.querySelectorAll(".tab-content");
 
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", (e) => {
-      e.preventDefault();
-
-      // Hide all content
-      profileContent.classList.add("hidden");
-      walletsContent.classList.add("hidden");
-
-      // Deactivate all tabs
-      tabs.forEach((t) => {
-        t.classList.remove("bg-gray-700");
-        t.classList.add("bg-gray-800");
+    function hideAllTabContents() {
+      tabContents.forEach((content) => {
+        content.classList.add("hidden");
       });
+    }
 
-      // Activate the clicked tab and show content
-      if (e.target.id === "profile-tab") {
-        profileContent.classList.remove("hidden");
-      } else if (e.target.id === "wallets-tab") {
-        walletsContent.classList.remove("hidden");
-      }
-      e.target.classList.remove("bg-gray-800");
-      e.target.classList.add("bg-gray-700");
+    function deactivateAllTabs() {
+      tabs.forEach((tab) => {
+        tab.classList.remove("bg-gray-700");
+        tab.classList.add("bg-gray-800");
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const tabName = tab.getAttribute("data-tab");
+        const tabContent = document.getElementById(`${tabName}-content`);
+
+        // Hide all tab contents and deactivate all tabs
+        hideAllTabContents();
+        deactivateAllTabs();
+
+        // Show the corresponding tab content
+        tabContent.classList.remove("hidden");
+
+        // Activate the clicked tab
+        tab.classList.remove("bg-gray-800");
+        tab.classList.add("bg-gray-700");
+      });
     });
+
+    // Manually activate the first tab on page load
+    tabs[0].click();
   });
-});
 </script>
+
 {% endblock %}

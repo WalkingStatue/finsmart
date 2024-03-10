@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen pt-10">
+    <div class="container mx-auto max-w-xl">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-semibold text-white mb-6">Categories</h2>
+            <a href="{% url 'transactions:add_category' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 block text-center">Add Category</a>
+            <ul class="space-y-4">
+                {% for category in categories %}
+                <li class="flex justify-between items-center bg-gray-700 p-4 rounded-md">
+                    <span class="text-white font-medium">{{ category.name }}</span>
+                    <div>
+                        <a href="{% url 'transactions:update_category' pk=category.pk %}"
+                           class="text-sm bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out mr-2">
+                            Edit
+                        </a>
+                        <a href="{% url 'transactions:delete_category' pk=category.pk %}"
+                           class="text-sm bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out">
+                            Delete
+                        </a>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="text-white text-center">
+                    No categories found.
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
