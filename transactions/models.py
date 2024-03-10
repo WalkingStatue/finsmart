@@ -3,6 +3,7 @@ from django.conf import settings
 from accounts.models import Account
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from budgets.models import Budget
 
 now = timezone.now()  # This is timezone-aware and set to 'Asia/Kolkata'
 
@@ -39,6 +40,7 @@ class Transaction(models.Model):
     description = models.CharField(max_length=255)
     category = models.ForeignKey(Category, related_name='transactions', on_delete=models.SET_NULL, null=True, blank=True)
     transaction_date = models.DateTimeField(auto_now_add=True)
+    budget = models.ForeignKey(Budget, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
 
     def __str__(self):
         return f"{self.wallet} - {self.amount} - {self.description}"
@@ -46,3 +48,8 @@ class Transaction(models.Model):
     def clone(self):
         """Create a clone of the current transaction instance, used for comparison."""
         return Transaction(account=self.account, wallet=self.wallet, transaction_type=self.transaction_type, amount=self.amount)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.budget:
+            self.budget.update_amount_spent()

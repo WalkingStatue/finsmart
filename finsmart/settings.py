@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     #'transactions',
     'transactions.apps.TransactionsConfig',
+    'budgets',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

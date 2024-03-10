@@ -50,6 +50,19 @@
                             <input type="text" name="description" id="id_description" required value="{{ form.fields.description.value }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-600 bg-gray-700 text-white rounded-md">
                         </div>
 
+                        <!-- Budget Field -->
+                        <div class="sm:col-span-6">
+                            <label for="id_budget" class="block text-sm font-medium text-gray-300">Budget</label>
+                            <select id="id_budget" name="budget" class="mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">Select Budget</option>
+                                {% for budget in form.fields.budget.queryset %}
+                                <option value="{{ budget.id }}" {% if form.fields.budget.value == budget.id %} selected {% endif %}>
+                                    {{ budget.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
                         <!-- Category Field -->
                         <div class="sm:col-span-6">
                             <label for="id_category" class="block text-sm font-medium text-gray-300">Category</label>

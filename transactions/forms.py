@@ -1,5 +1,6 @@
 from django import forms
 from .models import Category,Wallet,Transaction
+from budgets.models import Budget
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -16,13 +17,24 @@ class WalletForm(forms.ModelForm):
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['wallet', 'transaction_type', 'amount', 'description', 'category']
+        fields = ['wallet', 'transaction_type', 'amount', 'description', 'category', 'budget']
         
     def __init__(self, *args, user=None, **kwargs):
         super(TransactionForm, self).__init__(*args, **kwargs)
         if user:
             self.fields['wallet'].queryset = Wallet.objects.filter(account__user=user)
             self.fields['category'].queryset = Category.objects.filter(account__user=user)
+            self.fields['budget'].queryset = Budget.objects.filter(account__user=user)
+
+    def form_valid(self, form):
+        #form.instance.user = self.request.user  # Assuming the Transaction model links directly to the Django User
+        #form.instance.account = self.request.user.account  # If your Transaction model links to a custom Account model
+        response = super().form_valid(form)  # This saves the Transaction
+        transaction = form.instance
+        if transaction.budget:
+            transaction.budget.update_amount_spent()  # Make sure your Budget model has this method
+            transaction.budget.save()
+        return response
 
     def clean(self):
         cleaned_data = super().clean()
