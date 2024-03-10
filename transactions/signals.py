@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from .models import Wallet,Category,Transaction
-from django.db.models.signals import pre_save, post_save, pre_delete
+from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from accounts.models import Account
 
@@ -61,3 +61,26 @@ def update_wallet_balance_on_delete(sender, instance, **kwargs):
     # If the balance check passes, proceed to update the wallet balance
     instance.wallet.balance = new_balance
     instance.wallet.save()
+
+@receiver(post_save, sender=Transaction)
+def update_budget_on_save(sender, instance, created, **kwargs):
+    if created or instance.pk:
+        budget = instance.budget
+        if budget:
+            budget.update_amount_spent()
+
+@receiver(pre_save, sender=Transaction)
+def update_budget_before_update(sender, instance, **kwargs):
+    if instance.pk:
+        old_instance = Transaction.objects.get(pk=instance.pk)
+        if (old_instance.amount != instance.amount or
+                old_instance.transaction_type != instance.transaction_type):
+            budget = old_instance.budget
+            if budget:
+                budget.update_amount_spent()
+
+@receiver(post_delete, sender=Transaction)
+def update_budget_on_delete(sender, instance, **kwargs):
+    budget = instance.budget
+    if budget:
+        budget.update_amount_spent()

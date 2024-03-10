@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import Account
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from decimal import Decimal
 
 class Budget(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='budgets')
@@ -17,6 +18,11 @@ class Budget(models.Model):
         return self.name
 
     def update_amount_spent(self):
-        self.amount_spent = self.transactions.aggregate(total=Sum('amount'))['total'] or 0.00
+        debit_transactions_total = self.transactions.filter(
+            transaction_type='debit'
+        ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00') 
+
+        self.amount_spent = debit_transactions_total
         self.amount_remaining = self.total_budget - self.amount_spent
         self.save()
+
