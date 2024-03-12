@@ -84,3 +84,26 @@ def update_budget_on_delete(sender, instance, **kwargs):
     budget = instance.budget
     if budget:
         budget.update_amount_spent()
+
+@receiver(post_save, sender=Transaction)
+def update_goal_on_save(sender, instance, created, **kwargs):
+    if created or instance.pk:
+        goal = instance.goal
+        if goal:
+            goal.update_amount_earned()
+
+@receiver(pre_save, sender=Transaction)
+def update_goal_before_update(sender, instance, **kwargs):
+    if instance.pk:
+        old_instance = Transaction.objects.get(pk=instance.pk)
+        if (old_instance.amount != instance.amount or
+                old_instance.transaction_type != instance.transaction_type):
+            goal = old_instance.goal
+            if goal:
+                goal.update_amount_earned()
+
+@receiver(post_delete, sender=Transaction)
+def update_goal_on_delete(sender, instance, **kwargs):
+    goal = instance.goal
+    if goal:
+        goal.update_amount_earned()

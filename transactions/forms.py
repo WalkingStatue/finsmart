@@ -1,6 +1,7 @@
 from django import forms
 from .models import Category,Wallet,Transaction
 from budgets.models import Budget
+from goals.models import Goal
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -17,7 +18,7 @@ class WalletForm(forms.ModelForm):
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['wallet', 'transaction_type', 'amount', 'description', 'category', 'budget']
+        fields = ['wallet', 'transaction_type', 'amount', 'description', 'category', 'budget', 'goal']
         
     def __init__(self, *args, user=None, **kwargs):
         super(TransactionForm, self).__init__(*args, **kwargs)
@@ -25,6 +26,7 @@ class TransactionForm(forms.ModelForm):
             self.fields['wallet'].queryset = Wallet.objects.filter(account__user=user)
             self.fields['category'].queryset = Category.objects.filter(account__user=user)
             self.fields['budget'].queryset = Budget.objects.filter(account__user=user)
+            self.fields['goal'].queryset = Goal.objects.filter(account__user=user)
 
     def form_valid(self, form):
         #form.instance.user = self.request.user  # Assuming the Transaction model links directly to the Django User
@@ -34,8 +36,10 @@ class TransactionForm(forms.ModelForm):
         if transaction.budget:
             transaction.budget.update_amount_spent()  # Make sure your Budget model has this method
             transaction.budget.save()
+        if transaction.goal:
+            transaction.goal.update_amount_earned()  # Make sure your Goal model has this method
+            transaction.goal.save()
         return response
-
     def clean(self):
         cleaned_data = super().clean()
         wallet = cleaned_data.get('wallet')

@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from accounts import urls as account_urls
 from transactions import urls as transaction_urls
 from budgets import urls as budget_urls
+from goals import urls as goal_urls
 from django.conf import settings
 
 
@@ -29,5 +30,6 @@ urlpatterns = [
     path("",include(account_urls,namespace="account")),
     path("transactions/",include(transaction_urls,namespace="transactions")),
     path("budgets/",include(budget_urls,namespace="budgets")),
+    path("goals/",include("goals.urls",namespace="goals")),
     path("", include("allauth.urls")),
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

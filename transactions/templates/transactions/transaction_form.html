@@ -63,11 +63,24 @@
                             </select>
                         </div>
 
+                        <!-- Budget Field -->
+                        <div class="sm:col-span-6">
+                            <label for="id_goal" class="block text-sm font-medium text-gray-300">Goal</label>
+                            <select id="id_goal" name="goal" class="mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">Select Goal</option>
+                                {% for goal in form.fields.goal.queryset %}
+                                <option value="{{ goal.id }}" {% if form.fields.goal.value == goal.id %} selected {% endif %}>
+                                    {{ goal.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
                         <!-- Category Field -->
                         <div class="sm:col-span-6">
                             <label for="id_category" class="block text-sm font-medium text-gray-300">Category</label>
                             <select id="id_category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="">No Category</option>
+                                <option value="">Select Category</option>
                                 {% for category in form.fields.category.queryset %}
                                 <option value="{{ category.id }}" {% if form.fields.category.value == category.id %} selected {% endif %}>
                                     {{ category.name }}
