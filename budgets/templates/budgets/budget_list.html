@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="max-w-4xl mt-5 mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 rounded-lg shadow">
+<div class="max-w-4xl mt-5 mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 rounded-lg shadow">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-4xl font-bold text-white">Budgets</h1>
         <a href="{% url 'budgets:budget_create' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-300 ease-in-out">
-            <!-- Using Flowbite SVG icon, if you're not using Flowbite, the Tailwind CSS styling will still apply -->
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -15,24 +14,32 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for budget in budgets %}
-        <div class="bg-gray-800 hover:bg-gray-700 transition duration-300 ease-in-out rounded-xl p-6 shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl text-white font-semibold">{{ budget.name }}</h3>
-                <div class="flex items-center">
-                    <a href="{% url 'budgets:budget_update' budget.pk %}" class="text-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md mr-2 transition duration-300 ease-in-out">
-                        Edit
-                    </a>
-                    <a href="{% url 'budgets:budget_delete' budget.pk %}" class="text-sm px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition duration-300 ease-in-out">
-                        Delete
-                    </a>
+        <div>
+            {% if budget.remaining_budget_percentage < 20 %}
+            <div class="bg-red-600 text-white px-4 py-3 rounded-t-lg mb-2" role="alert">
+                <strong class="font-bold">Warning!</strong>
+                <span>You've used over 80% of your {{ budget.name }} budget.</span>
+            </div>
+            {% endif %}
+            <div class="bg-gray-800 hover:bg-gray-700 transition duration-300 ease-in-out rounded-lg shadow-lg {% if budget.remaining_budget_percentage < 20 %}mt-0 rounded-t-none{% else %}mb-4{% endif %}">
+                <div class="flex justify-between items-center mb-4 px-6 py-4">
+                    <h3 class="text-2xl text-white font-semibold">{{ budget.name }}</h3>
+                    <div class="flex items-center">
+                        <a href="{% url 'budgets:budget_update' budget.pk %}" class="text-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md mr-2 transition duration-300 ease-in-out">
+                            Edit
+                        </a>
+                        <a href="{% url 'budgets:budget_delete' budget.pk %}" class="text-sm px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition duration-300 ease-in-out">
+                            Delete
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <div class="w-full bg-gray-700 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {% widthratio budget.amount_spent budget.total_budget 100 %}%"></div>
-            </div>
-            <div class="flex justify-left text-sm font-medium text-gray-300 mt-2">
-                <p>₹{{ budget.amount_spent }}</p>
-                <p>/ ₹{{ budget.total_budget }}</p>
+                <div class="mx-6 bg-gray-700 rounded-full h-2.5 dark:bg-gray-700">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ budget.remaining_budget_percentage }}%;"></div>
+                </div>            
+                <div class="flex justify-between text-sm font-medium text-gray-300 mt-2 px-6 py-4">
+                    <p>Remaining: ₹{{ budget.amount_remaining }}</p>
+                    <p>Total: ₹{{ budget.total_budget }}</p>
+                </div>
             </div>
         </div>
         {% empty %}

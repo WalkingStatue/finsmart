@@ -26,3 +26,9 @@ class Budget(models.Model):
         self.amount_remaining = self.total_budget - self.amount_spent
         self.save()
 
+    @property
+    def remaining_budget_percentage(self):
+        if self.total_budget <= 0:
+            return 0  # Prevent division by zero and ensure percentage is not negative if total_budget is 0 or less.
+        percentage = (self.amount_remaining / self.total_budget) * 100
+        return max(0, percentage)  # Ensure percentage does not go below 0.
