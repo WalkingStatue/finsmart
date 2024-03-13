@@ -3,18 +3,35 @@ from django.views.generic.list import ListView
 from .models import Budget
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from .forms import BudgetForm  # If you're using a custom form
-
+from .forms import BudgetForm  
+from django.utils import timezone
 class BudgetListView(LoginRequiredMixin, ListView):
     model = Budget
     context_object_name = 'budgets'
     template_name = 'budgets/budget_list.html'
 
     def get_queryset(self):
-    # Filter budgets to only include those associated with the logged-in user's account
+        today = timezone.now().date()
         queryset = Budget.objects.filter(account__user=self.request.user)
-        return queryset
 
+        for budget in queryset:
+            # Calculate the number of days remaining in the budget period
+            if budget.end_date and budget.end_date >= today:
+                days_remaining = (budget.end_date - today).days
+            else:
+                days_remaining = 0  # or however you want to handle past budget periods
+            
+            # Calculate how much can be spent each day
+            if days_remaining > 0:
+                daily_spendable = budget.amount_remaining / days_remaining
+            else:
+                daily_spendable = budget.amount_remaining  # or set to 0 if the period has ended
+            
+            # Attach the calculations to the budget object
+            budget.days_remaining = days_remaining
+            budget.daily_spendable = daily_spendable
+        
+        return queryset
 
 
 class BudgetCreateView(LoginRequiredMixin, CreateView):

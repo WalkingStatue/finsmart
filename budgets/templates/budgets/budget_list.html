@@ -40,6 +40,12 @@
                     <p>Remaining: ₹{{ budget.amount_remaining }}</p>
                     <p>Total: ₹{{ budget.total_budget }}</p>
                 </div>
+                <!-- Display the daily spendable amount and days remaining -->
+                {% if budget.days_remaining > 0 %}
+                <div class="bg-gray-700 rounded-lg px-6 py-4 text-center">
+                    <p class="text-sm text-gray-400">You can spend ₹{{ budget.daily_spendable|floatformat:2 }}/day for {{ budget.days_remaining }} more days</p>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% empty %}

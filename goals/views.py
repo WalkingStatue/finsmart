@@ -2,7 +2,9 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
 from django.urls import reverse_lazy
+from django.utils import timezone
 from .forms import GoalForm
+from datetime import date
 from .models import Goal
 
 class GoalListView(LoginRequiredMixin, ListView):
@@ -11,9 +13,22 @@ class GoalListView(LoginRequiredMixin, ListView):
     template_name = 'goals/goal_list.html'
 
     def get_queryset(self):
+        # Get the current user's goals
         queryset = Goal.objects.filter(account__user=self.request.user)
+        today = timezone.now().date()
+        for goal in queryset:
+            # Calculate days remaining only if target_date is set
+            if goal.target_date:
+                delta = goal.target_date - today
+                goal.days_remaining = max(delta.days, 0)  # Ensuring it doesn't go negative
+            else:
+                goal.days_remaining = None
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['today'] = timezone.now().date()
+        return context
 
 
 class GoalCreateView(LoginRequiredMixin, CreateView):

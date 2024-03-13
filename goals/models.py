@@ -26,3 +26,8 @@ class Goal(models.Model):
         self.amount_remaining = self.total_goal - self.amount_earned
         self.save()
 
+    def remaining_budget_percentage(self):
+        if self.total_goal <= 0:
+            return 0  # Prevent division by zero
+        percentage = (self.amount_remaining / self.total_goal) * 100
+        return max(0, percentage)  
