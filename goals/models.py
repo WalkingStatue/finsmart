@@ -9,7 +9,7 @@ class Goal(models.Model):
     total_goal = models.DecimalField(max_digits=10, decimal_places=2)
     amount_earned = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_remaining = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
-
+    target_date = models.DateField(null=True, blank=True)
     def save(self, *args, **kwargs):
         self.amount_remaining = self.total_goal - self.amount_earned
         super().save(*args, **kwargs)

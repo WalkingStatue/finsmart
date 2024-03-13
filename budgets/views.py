@@ -30,7 +30,7 @@ class BudgetCreateView(LoginRequiredMixin, CreateView):
 
 class BudgetUpdateView(LoginRequiredMixin, UpdateView):
     model = Budget
-    form_class = BudgetForm  # or fields = ['name', 'total_budget', 'amount_spent']
+    form_class = BudgetForm
     template_name = 'budgets/budget_form.html'
     success_url = reverse_lazy('budgets:budget_list')
 

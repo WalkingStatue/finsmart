@@ -7,7 +7,7 @@
         {% csrf_token %}
         <div class="grid grid-cols-1 gap-6">
             {% for field in form %}
-            <div class="col-span-1">
+            <div class="col-span-1" id="div_id_{{ field.name }}">
                 <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-white">{{ field.label }}</label>
                 {% render_field field class="mt-1 bg-gray-800 text-white focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %}
                 {% if field.help_text %}
@@ -26,4 +26,25 @@
         </div>
     </form>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const periodSelect = document.querySelector('#id_period'); // Make sure 'id_period' matches the actual ID
+    const endDateDiv = document.querySelector('#div_id_end_date'); // This assumes you have a div with this ID around the end_date field
+
+    function toggleEndDateVisibility() {
+        // Check if the selected value is 'custom'
+        if (periodSelect.value === 'custom') {
+            endDateDiv.style.display = ''; // Show
+        } else {
+            endDateDiv.style.display = 'none'; // Hide
+        }
+    }
+
+    // Initial check in case the form is loaded with an existing value
+    toggleEndDateVisibility();
+
+    // Add event listener to period select field
+    periodSelect.addEventListener('change', toggleEndDateVisibility);
+});
+</script>
 {% endblock %}
