@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-4xl mt-5 mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 rounded-lg shadow">
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900 rounded-lg shadow-lg">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-4xl font-bold text-white">Goals</h1>
-        <a href="{% url 'goals:goal_create' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-300 ease-in-out">
-            <!-- Icon and label -->
+        <a href="{% url 'goals:goal_create' %}" class="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition ease-in-out duration-300">
             Add Goal
         </a>
     </div>
@@ -13,40 +12,46 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for goal in goals %}
         <div>
-            {% if goal.remaining_budget_percentage < 20 %}
-            <div class="bg-green-600 text-white px-4 py-3 rounded-t-lg mb-2" role="alert">
-                <strong class="font-bold">Appreciation!</strong>
-                <span>You're close to reaching your {{ goal.name }} goal.</span>
-            </div>
-            {% endif %}
-        <div class="bg-gray-800 hover:bg-gray-700 transition duration-300 ease-in-out rounded-xl p-6 shadow-lg">
-            
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl text-white font-semibold">{{ goal.name }}</h3>
-                <div class="flex items-center">
-                    <a href="{% url 'goals:goal_update' goal.pk %}" class="text-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md mr-2 transition duration-300 ease-in-out">
-                        Edit
-                    </a>
-                    <a href="{% url 'goals:goal_delete' goal.pk %}" class="text-sm px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition duration-300 ease-in-out">
-                        Delete
-                    </a>
+            {% if goal.remaining_budget_percentage == 100 %}
+                <div class="bg-green-600 text-white px-4 py-3 rounded-t-xl mb-4" role="alert">
+                    <strong class="font-bold">Congratulations!</strong>
+                    <span>You've reached your {{ goal.name }} goal.</span>
+                </div>
+                {% elif goal.remaining_budget_percentage >= 80 %}
+                <div class="bg-green-600 text-white px-4 py-3 rounded-t-xl mb-4" role="alert">
+                    <strong class="font-bold">Appreciation!</strong>
+                    <span>You're close to reaching your {{ goal.name }} goal.</span>
+                </div>
+                {% endif %}
+            <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl text-white font-semibold">{{ goal.name }}</h3>
+                    <div class="flex items-center">
+                        <a href="{% url 'goals:goal_update' goal.pk %}" class="text-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md mr-2 transition duration-300 ease-in-out">
+                            Edit
+                        </a>
+                        <a href="{% url 'goals:goal_delete' goal.pk %}" class="text-sm px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition duration-300 ease-in-out">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ goal.remaining_budget_percentage }}%;"></div>
+                </div>
+                
+                <div class="flex justify-between text-sm font-medium text-gray-300 mt-4">
+                    <p>₹{{ goal.amount_earned }} / ₹{{ goal.total_goal }}</p>
+                    {% if goal.days_remaining is not None %}
+                    <p>{{ goal.days_remaining }} days remaining</p>
+                    {% else %}
+                    <p>No target date set</p>
+                    {% endif %}
                 </div>
             </div>
-            <div class="w-full bg-gray-700 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {% widthratio goal.amount_earned goal.total_goal 100 %}%"></div>
-            </div>
-            <div class="flex justify-between text-sm font-medium text-gray-300 mt-2">
-                <p>₹{{ goal.amount_earned }} / ₹{{ goal.total_goal }}</p>
-                {% if goal.days_remaining is not None %}
-                <p>{{ goal.days_remaining }} days remaining</p>
-                {% else %}
-                <p>No target date set</p>
-                {% endif %}
-            </div>
         </div>
-    </div>
         {% empty %}
-        <p class="text-white text-center w-full">No Goals to display.</p>
+            <p class="text-white text-center w-full">No Goals to display.</p>
         {% endfor %}
     </div>
 </div>

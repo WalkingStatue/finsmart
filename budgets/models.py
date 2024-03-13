@@ -48,7 +48,7 @@ class Budget(models.Model):
     def update_amount_spent(self):
         debit_transactions_total = self.transactions.filter(
             transaction_type='debit',
-            date__range=[self.start_date, self.end_date]
+            transaction_date__range=[self.start_date, self.end_date]  # Changed 'date' to 'transaction_date'
         ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
 
         self.amount_spent = debit_transactions_total
