@@ -6,6 +6,14 @@ from accounts.models import Account
 from decimal import Decimal
 
 
+
+@receiver(pre_save, sender=Transaction)
+def check_wallet_balance(sender, instance, *args, **kwargs):
+    if instance.transaction_type == 'debit':
+        current_balance = instance.wallet.balance
+        if current_balance - Decimal(instance.amount) < 0:
+            raise ValueError("Insufficient funds in wallet to complete this transaction.")
+
 @receiver(post_save, sender=Account)
 def create_default_wallet(sender, instance, created, **kwargs):
     if created:

@@ -71,8 +71,8 @@
         <div class="mt-4 bg-gray-900 p-6 rounded-lg shadow-md">
             <div class="flex flex-col items-center text-center">
                 <h2 class="text-xl font-semibold text-white mb-4">Financial Summary</h2>
-                <p class="text-green-500 font-bold">Total Income: ₹{{ total_income|intcomma }}</p>
-                <p class="text-red-500 font-bold">Total Expenses: ₹{{ total_expenses|intcomma }}</p>
+                <p class="text-green-500 font-bold">Total Income: ₹{{ total_income|floatformat:2|intcomma }}</p>
+                <p class="text-red-500 font-bold">Total Expenses: ₹{{ total_expenses|floatformat:2|intcomma }}</p>
             </div>
             <div class="mt-4">
                 <div id="chart" class="w-full">
@@ -80,13 +80,22 @@
                 </div>
             </div>
         </div>
+        
         <!-- Stacked Bar Chart for Income and Expenses by Category -->
-        <div class="mt-4 bg-gray-900 p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-semibold text-white mb-4">Income and Expenses by Category</h2>
-            <div id="stacked-bar-chart" style="width: 100%; height: 100%;">
-                {{ stacked_bar_plot_div|safe }}
-            </div>
+           <div class="mt-4 bg-gray-900 p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold text-white mb-4">Financial Overview</h2>
+                <div class="flex flex-wrap justify-around items-center">
+                    <div class="w-full lg:w-1/2 p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">Income by Category</h3>
+                        <div>{{ income_pie_div|safe }}</div>
+                    </div>
+                    <div class="w-full lg:w-1/2 p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">Expenses by Category</h3>
+                        <div>{{ expenses_pie_div|safe }}</div>
+                    </div>
+                </div>
         </div>
+
         <!-- Recent Transactions Section -->
         <div class="mt-4 bg-gray-900 p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold text-white mb-4">Recent Transactions</h2>

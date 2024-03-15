@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from transactions.models import Transaction, Wallet, Category
+from transactions.models import Transaction, Category
 from budgets.models import Budget
 from goals.models import Goal
 from datetime import datetime
-from django.db.models import Sum, Case, When, Value, CharField
+from django.db.models import Sum, Case, When, Value, DecimalField
 import plotly.graph_objs as go
 from plotly.offline import plot
 from django.db.models.functions import TruncDay
@@ -15,10 +15,11 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Filter budgets by logged-in user
+        # Get budgets and goals associated with the current user
         context['budgets'] = Budget.objects.filter(account__user=self.request.user)
         context['goals'] = Goal.objects.filter(account__user=self.request.user)
 
+        # Daily financial tips array
         financial_tips = [
         "Tip 1: Keep an emergency fund.",
         "Tip 2: Pay off your credit card balance every month.",
@@ -73,14 +74,16 @@ class DashboardView(TemplateView):
         # ... Add more tips up to 100 as you like
         ]
 
-        # Choose a tip based on the day of the year
+        # Select a daily tip based on the day of the year
         day_of_year = datetime.now().timetuple().tm_yday
         tip_of_the_day = financial_tips[(day_of_year - 1) % len(financial_tips)]
         context['tip_of_the_day'] = tip_of_the_day
 
+        # Fetch the most recent transactions for the current user
         recent_transactions = Transaction.objects.filter(account__user=self.request.user).order_by('-transaction_date')[:5]
         context['recent_transactions'] = recent_transactions
 
+        # Aggregate total income and expenses for the current user
         income = Transaction.objects.filter(
             account__user=self.request.user,
             transaction_type='credit'
@@ -91,9 +94,11 @@ class DashboardView(TemplateView):
             transaction_type='debit'
         ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
 
+        # Add total income and expenses to the context
         context['total_income'] = income
         context['total_expenses'] = expenses
 
+        # Prepare data for income and expenses over time for line charts
         income_by_day = Transaction.objects.filter(
             account__user=self.request.user,
             transaction_type='credit'
@@ -104,10 +109,7 @@ class DashboardView(TemplateView):
             transaction_type='debit'
         ).annotate(day=TruncDay('transaction_date')).values('day').annotate(total=Sum('amount')).order_by('day')
 
-        context['income'] = income_by_day
-        context['expenses'] = expenses_by_day
-
-         # Plotly: Create line chart data for income and expenses
+        # Generate the line chart data for income and expenses
         income_trace = go.Scatter(
             x=[item['day'] for item in income_by_day],
             y=[item['total'] for item in income_by_day],
@@ -174,52 +176,63 @@ class DashboardView(TemplateView):
 
         context['plot_div'] = plot_div
 
-        ## Pie Chart For Categories
+        # Step 1: Prepare data for the pie charts
+        # This section aggregates total income and expenses by category
         categories = Category.objects.filter(
-            transactions_category__account__user=self.request.user
+            transactions__account__user=self.request.user
         ).distinct()
 
-        # Aggregate income and expenses by category
         category_data = categories.annotate(
             total_income=Sum(
                 Case(
-                    When(transactions_category__transaction_type='credit', then='transactions_category__amount'),
+                    When(transactions__transaction_type='credit', then='transactions__amount'),
                     default=Value(0),
-                    output_field=CharField()
+                    output_field=DecimalField()
                 )
             ),
             total_expenses=Sum(
                 Case(
-                    When(transactions_category__transaction_type='debit', then='transactions_category__amount'),
+                    When(transactions__transaction_type='debit', then='transactions__amount'),
                     default=Value(0),
-                    output_field=CharField()
+                    output_field=DecimalField()
                 )
             )
         ).values('name', 'total_income', 'total_expenses').order_by('name')
 
-        context['category_data'] = list(category_data)
-        income_trace = go.Bar(
-            name='Income',
-            x=[category['name'] for category in context['category_data']],
-            y=[category['total_income'] for category in context['category_data']],
-            marker=dict(color='green'),
-        )
-        expenses_trace = go.Bar(
-            name='Expenses',
-            x=[category['name'] for category in context['category_data']],
-            y=[category['total_expenses'] for category in context['category_data']],
-            marker=dict(color='red'),
-        )
+        # Step 2: Generate Pie Charts for Income and Expenses by Category
+        # These pie charts use the aggregated data to show the proportion of each category in total income and expenses
 
-        data = [income_trace, expenses_trace]
-        layout = go.Layout(
-            title='Income and Expenses by Category',
-            barmode='stack',
+        # Create the income pie chart
+        income_labels = [category['name'] for category in category_data if category['total_income'] > 0]
+        income_values = [category['total_income'] for category in category_data if category['total_income'] > 0]
+
+        income_pie = go.Pie(labels=income_labels, values=income_values, name="Income")
+        income_layout = go.Layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
             margin=dict(l=30, r=30, t=30, b=30)
         )
+        income_fig = go.Figure(data=[income_pie], layout=income_layout)
+        income_pie_div = plot(income_fig, output_type='div', include_plotlyjs=False)
 
-        fig = go.Figure(data=data, layout=layout)
-        stacked_bar_plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+        # Create the expenses pie chart
+        expenses_labels = [category['name'] for category in category_data if category['total_expenses'] > 0]
+        expenses_values = [category['total_expenses'] for category in category_data if category['total_expenses'] > 0]
 
-        context['stacked_bar_plot_div'] = stacked_bar_plot_div
+        expenses_pie = go.Pie(labels=expenses_labels, values=expenses_values, name="Expenses")
+        expenses_layout = go.Layout(
+            #title="Expenses by Category",
+            #titlefont=dict(color='white'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
+            margin=dict(l=30, r=30, t=30, b=30)
+        )
+        expenses_fig = go.Figure(data=[expenses_pie], layout=expenses_layout)
+        expenses_pie_div = plot(expenses_fig, output_type='div', include_plotlyjs=False)
+
+        context['income_pie_div'] = income_pie_div
+        context['expenses_pie_div'] = expenses_pie_div
+
         return context

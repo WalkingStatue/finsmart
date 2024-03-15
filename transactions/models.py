@@ -34,13 +34,13 @@ class Transaction(models.Model):
         ('credit', 'Credit'),
     ]
 
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions_account')
-    wallet = models.ForeignKey(Wallet, related_name='transactions_wallet', on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
+    wallet = models.ForeignKey(Wallet, related_name='transactions', on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=6, choices=TRANSACTION_TYPE_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, related_name='transactions_category', on_delete=models.SET_NULL, null=True, blank=True)
-    transaction_date = models.DateTimeField(auto_now_add=True)
+    category = models.ForeignKey(Category, related_name='transactions', on_delete=models.SET_NULL, null=True, blank=True)
+    transaction_date = models.DateTimeField(default=timezone.now)
     budget = models.ForeignKey(Budget, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
     goal = models.ForeignKey(Goal, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
 
