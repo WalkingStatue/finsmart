@@ -18,7 +18,8 @@
       href="https://unpkg.com/flowbite@1.5.1/dist/flowbite.min.css"
     />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+
     <title>{% block title %}FinSmart{% endblock %}</title>
   </head>
   <body>
@@ -139,7 +140,7 @@
           >
             <li>
               <a
-                href="/"
+                href="{% url 'dashboard:user_dashboard' %}"
                 class="nav-link block py-2 px-3 text-gray-900 dark:text-white"
                 >Home</a
               >
