@@ -3,6 +3,8 @@ from .models import Wallet,Category,Transaction
 from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
 from django.dispatch import receiver
 from accounts.models import Account
+from decimal import Decimal
+
 
 @receiver(post_save, sender=Account)
 def create_default_wallet(sender, instance, created, **kwargs):
@@ -29,9 +31,9 @@ def update_wallet_balance(sender, instance, created, **kwargs):
     if created:
         # Logic for new transactions
         if instance.transaction_type == 'credit':
-            instance.wallet.balance += instance.amount
+            instance.wallet.balance += Decimal(instance.amount)
         else:  # 'debit'
-            instance.wallet.balance -= instance.amount
+            instance.wallet.balance -= Decimal(instance.amount)
         instance.wallet.save()
     else:
         # Handle updates

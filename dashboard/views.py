@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from transactions.models import Transaction
+from transactions.models import Transaction, Wallet, Category
 from budgets.models import Budget
 from goals.models import Goal
 from datetime import datetime
-from django.db.models import Sum
+from django.db.models import Sum, Case, When, Value, CharField
 import plotly.graph_objs as go
 from plotly.offline import plot
 from django.db.models.functions import TruncDay
@@ -14,6 +14,7 @@ class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
         # Filter budgets by logged-in user
         context['budgets'] = Budget.objects.filter(account__user=self.request.user)
         context['goals'] = Goal.objects.filter(account__user=self.request.user)
@@ -173,5 +174,52 @@ class DashboardView(TemplateView):
 
         context['plot_div'] = plot_div
 
+        ## Pie Chart For Categories
+        categories = Category.objects.filter(
+            transactions_category__account__user=self.request.user
+        ).distinct()
 
+        # Aggregate income and expenses by category
+        category_data = categories.annotate(
+            total_income=Sum(
+                Case(
+                    When(transactions_category__transaction_type='credit', then='transactions_category__amount'),
+                    default=Value(0),
+                    output_field=CharField()
+                )
+            ),
+            total_expenses=Sum(
+                Case(
+                    When(transactions_category__transaction_type='debit', then='transactions_category__amount'),
+                    default=Value(0),
+                    output_field=CharField()
+                )
+            )
+        ).values('name', 'total_income', 'total_expenses').order_by('name')
+
+        context['category_data'] = list(category_data)
+        income_trace = go.Bar(
+            name='Income',
+            x=[category['name'] for category in context['category_data']],
+            y=[category['total_income'] for category in context['category_data']],
+            marker=dict(color='green'),
+        )
+        expenses_trace = go.Bar(
+            name='Expenses',
+            x=[category['name'] for category in context['category_data']],
+            y=[category['total_expenses'] for category in context['category_data']],
+            marker=dict(color='red'),
+        )
+
+        data = [income_trace, expenses_trace]
+        layout = go.Layout(
+            title='Income and Expenses by Category',
+            barmode='stack',
+            margin=dict(l=30, r=30, t=30, b=30)
+        )
+
+        fig = go.Figure(data=data, layout=layout)
+        stacked_bar_plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+
+        context['stacked_bar_plot_div'] = stacked_bar_plot_div
         return context
