@@ -32,6 +32,6 @@ urlpatterns = [
     path("transactions/",include(transaction_urls,namespace="transactions")),
     path("budgets/",include(budget_urls,namespace="budgets")),
     path("goals/",include("goals.urls",namespace="goals")),
-    path("dashboard/",include(dashboard_urls,namespace="dashboard")),
+    path("",include(dashboard_urls,namespace="dashboard")),
     path("", include("allauth.urls")),
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
