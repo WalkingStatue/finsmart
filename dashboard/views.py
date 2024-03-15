@@ -4,6 +4,10 @@ from transactions.models import Transaction
 from budgets.models import Budget
 from goals.models import Goal
 from datetime import datetime
+from django.db.models import Sum
+import plotly.graph_objs as go
+from plotly.offline import plot
+from django.db.models.functions import TruncDay
 
 class DashboardView(TemplateView):
     template_name = 'dashboard/dashboard.html'
@@ -73,9 +77,101 @@ class DashboardView(TemplateView):
         tip_of_the_day = financial_tips[(day_of_year - 1) % len(financial_tips)]
         context['tip_of_the_day'] = tip_of_the_day
 
-        recent_transactions = Transaction.objects.filter(
-            account__user=self.request.user
-        ).order_by('-transaction_date')[:5]
+        recent_transactions = Transaction.objects.filter(account__user=self.request.user).order_by('-transaction_date')[:5]
         context['recent_transactions'] = recent_transactions
-        
+
+        income = Transaction.objects.filter(
+            account__user=self.request.user,
+            transaction_type='credit'
+        ).aggregate(total_income=Sum('amount'))['total_income'] or 0
+
+        expenses = Transaction.objects.filter(
+            account__user=self.request.user,
+            transaction_type='debit'
+        ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+
+        context['total_income'] = income
+        context['total_expenses'] = expenses
+
+        income_by_day = Transaction.objects.filter(
+            account__user=self.request.user,
+            transaction_type='credit'
+        ).annotate(day=TruncDay('transaction_date')).values('day').annotate(total=Sum('amount')).order_by('day')
+
+        expenses_by_day = Transaction.objects.filter(
+            account__user=self.request.user,
+            transaction_type='debit'
+        ).annotate(day=TruncDay('transaction_date')).values('day').annotate(total=Sum('amount')).order_by('day')
+
+        context['income'] = income_by_day
+        context['expenses'] = expenses_by_day
+
+         # Plotly: Create line chart data for income and expenses
+        income_trace = go.Scatter(
+            x=[item['day'] for item in income_by_day],
+            y=[item['total'] for item in income_by_day],
+            fill='tozeroy',  # for area chart
+            mode='lines',  # for line chart, change to 'lines+markers' if you want points
+            name='Income',
+            stackgroup='one'  # for area chart
+        )
+        expenses_trace = go.Scatter(
+            x=[item['day'] for item in expenses_by_day],
+            y=[item['total'] for item in expenses_by_day],
+            fill='tozeroy',  # for area chart
+            mode='lines',  # for line chart, change to 'lines+markers' if you want points
+            name='Expenses',
+            stackgroup='two'  # for area chart
+        )
+
+        data = [income_trace, expenses_trace]
+
+        layout = go.Layout(
+            title='Income and Expenses Over Time',
+            titlefont=dict(
+                size=22,
+                color='rgba(255,255,255, 0.9)',  # White with a bit of transparency
+            ),
+            xaxis=dict(
+                title='Date',
+                titlefont=dict(
+                    size=18,
+                    color='rgba(255,255,255, 0.9)'
+                ),
+                tickfont=dict(
+                    color='rgba(255,255,255, 0.7)'
+                ),
+                gridcolor='rgba(255,255,255, 0.3)'
+            ),
+            yaxis=dict(
+                title='Amount',
+                titlefont=dict(
+                    size=18,
+                    color='rgba(255,255,255, 0.9)'
+                ),
+                tickfont=dict(
+                    color='rgba(255,255,255, 0.7)'
+                ),
+                gridcolor='rgba(255,255,255, 0.3)'
+            ),
+            
+            width=1020,  # Width in pixels
+            height=500,  # Height in pixels
+            margin=dict(l=50, r=50, t=50, b=50),
+            paper_bgcolor='rgba(0,0,0,0)',  # Fully transparent
+            plot_bgcolor='rgba(0,0,0,0)',   # Fully transparent
+            legend=dict(
+                font=dict(
+                    color='rgba(255,255,255, 0.8)'
+                )
+            ),
+            
+        )
+
+        fig = go.Figure(data=data, layout=layout)
+        plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+
+        context['plot_div'] = plot_div
+
+
         return context
