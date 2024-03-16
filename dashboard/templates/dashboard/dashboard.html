@@ -75,11 +75,18 @@
                 <p class="text-red-500 font-bold">Total Expenses: ₹{{ total_expenses|floatformat:2|intcomma }}</p>
             </div>
             <div class="mt-4">
-                <div id="chart" class="w-full">
-                    {{ plot_div|safe }}
-                </div>
+                <!-- Date Range Selection -->
+                <select id="dateRangeType" class="mb-4 bg-gray-800 text-white border border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+
+                <!-- Container for the chart -->
+                <div id="chartContainer" class="bg-gray-800 p-4 rounded"></div>
             </div>
         </div>
+
         
         <!-- Stacked Bar Chart for Income and Expenses by Category -->
            <div class="mt-4 bg-gray-900 p-6 rounded-lg shadow-md">
@@ -133,3 +140,116 @@
       <!-- Other dashboard content here -->
     </div>
     {% endblock %}
+{% block javascript %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ajaxUrl = "{% url 'dashboard:transactions_date_range' %}";
+    
+        document.getElementById('dateRangeType').addEventListener('change', function() {
+            var rangeType = this.value;
+            fetchChartData(ajaxUrl, rangeType);
+        });
+    
+        function fetchChartData(baseUrl, rangeType) {
+            // Append the range type to the AJAX URL
+            var fetchUrl = `${baseUrl}?range_type=${rangeType}`;
+    
+            fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+                updateChart(data.income, data.expenses);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+    
+        function updateChart(incomeData, expensesData) {
+            console.log(incomeData, expensesData); // For debugging
+            var incomeTrace = {
+                x: incomeData.map(item => new Date(item.period)),
+                y: incomeData.map(item => parseFloat(item.total)),
+                fill: 'tozeroy',
+                mode: 'lines',
+                name: 'Income'
+            };
+            var expensesTrace = {
+                x: expensesData.map(item => new Date(item.period)),
+                y: expensesData.map(item => parseFloat(item.total)),
+                fill: 'tozeroy',
+                mode: 'lines',
+                name: 'Expenses'
+            };
+            var layout = {
+                title: 'Income and Expenses Over Time',
+                titlefont: {
+                    size: 22,
+                    color: 'rgba(255,255,255, 0.9)',
+                },
+                xaxis: {
+                    title: 'Date',
+                    titlefont: {
+                        size: 18,
+                        color: 'rgba(255,255,255, 0.9)'
+                    },
+                    tickfont: {
+                        color: 'rgba(255,255,255, 0.7)'
+                    },
+                    gridcolor: 'rgba(255,255,255, 0.3)'
+                },
+                yaxis: {
+                    title: 'Amount',
+                    titlefont: {
+                        size: 18,
+                        color: 'rgba(255,255,255, 0.9)'
+                    },
+                    tickfont: {
+                        color: 'rgba(255,255,255, 0.7)'
+                    },
+                    gridcolor: 'rgba(255,255,255, 0.3)'
+                },
+                width: 1020, // Width in pixels
+                height: 500, // Height in pixels
+                margin: {l: 50, r: 50, t: 50, b: 50},
+                paper_bgcolor: 'rgba(0,0,0,0)', // Fully transparent
+                plot_bgcolor: 'rgba(0,0,0,0)', // Fully transparent
+                legend: {
+                    font: {
+                        color: 'rgba(255,255,255, 0.8)'
+                    }
+                }
+            };
+            var config = {
+                displayModeBar: true, // Display the modebar
+                responsive: true, // Ensure the plot is responsive
+                toImageButtonOptions: {
+                    format: 'png', // Set the format of the image to download
+                    filename: 'income_vs_expenses', // Set a custom filename for the downloaded image
+                    height: 500, // Set the height of the downloaded image
+                    width: 1020, // Set the width of the downloaded image
+                    scale: 1 // Set the scale for the downloaded image
+                },
+                modeBarButtonsToRemove: [
+                    'pan2d', // Remove pan tool
+                    'select2d', // Remove selection tool
+                    'lasso2d', // Remove lasso tool
+                    'zoom2d', // Remove zoom (box) tool
+                    'toggleSpikelines', // Remove spikeline tool
+                    // 'hoverClosestCartesian', // Commented out to enable hover compare by default
+                ],
+                modeBarButtonsToAdd: [
+                    // Additional buttons can be added here if necessary
+                ],
+                modeBarButtons: [
+                    // Default buttons for zoom and reset
+                    ['toImage', 'zoomIn2d', 'zoomOut2d', 'resetScale2d', 'hoverCompareCartesian']
+                ]
+            };
+            Plotly.newPlot('chartContainer', [incomeTrace, expensesTrace], layout, config);
+
+        }
+    
+        // Initial chart load with default range type
+        fetchChartData(ajaxUrl, 'daily');
+    });
+    </script> 
+{% endblock %}

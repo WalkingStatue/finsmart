@@ -7,7 +7,8 @@ from datetime import datetime
 from django.db.models import Sum, Case, When, Value, DecimalField
 import plotly.graph_objs as go
 from plotly.offline import plot
-from django.db.models.functions import TruncDay
+from django.http import JsonResponse
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 
 class DashboardView(TemplateView):
     template_name = 'dashboard/dashboard.html'
@@ -98,83 +99,6 @@ class DashboardView(TemplateView):
         context['total_income'] = income
         context['total_expenses'] = expenses
 
-        # Prepare data for income and expenses over time for line charts
-        income_by_day = Transaction.objects.filter(
-            account__user=self.request.user,
-            transaction_type='credit'
-        ).annotate(day=TruncDay('transaction_date')).values('day').annotate(total=Sum('amount')).order_by('day')
-
-        expenses_by_day = Transaction.objects.filter(
-            account__user=self.request.user,
-            transaction_type='debit'
-        ).annotate(day=TruncDay('transaction_date')).values('day').annotate(total=Sum('amount')).order_by('day')
-
-        # Generate the line chart data for income and expenses
-        income_trace = go.Scatter(
-            x=[item['day'] for item in income_by_day],
-            y=[item['total'] for item in income_by_day],
-            fill='tozeroy',  # for area chart
-            mode='lines',  # for line chart, change to 'lines+markers' if you want points
-            name='Income',
-            stackgroup='one'  # for area chart
-        )
-        expenses_trace = go.Scatter(
-            x=[item['day'] for item in expenses_by_day],
-            y=[item['total'] for item in expenses_by_day],
-            fill='tozeroy',  # for area chart
-            mode='lines',  # for line chart, change to 'lines+markers' if you want points
-            name='Expenses',
-            stackgroup='two'  # for area chart
-        )
-
-        data = [income_trace, expenses_trace]
-
-        layout = go.Layout(
-            title='Income and Expenses Over Time',
-            titlefont=dict(
-                size=22,
-                color='rgba(255,255,255, 0.9)',  # White with a bit of transparency
-            ),
-            xaxis=dict(
-                title='Date',
-                titlefont=dict(
-                    size=18,
-                    color='rgba(255,255,255, 0.9)'
-                ),
-                tickfont=dict(
-                    color='rgba(255,255,255, 0.7)'
-                ),
-                gridcolor='rgba(255,255,255, 0.3)'
-            ),
-            yaxis=dict(
-                title='Amount',
-                titlefont=dict(
-                    size=18,
-                    color='rgba(255,255,255, 0.9)'
-                ),
-                tickfont=dict(
-                    color='rgba(255,255,255, 0.7)'
-                ),
-                gridcolor='rgba(255,255,255, 0.3)'
-            ),
-            
-            width=1020,  # Width in pixels
-            height=500,  # Height in pixels
-            margin=dict(l=50, r=50, t=50, b=50),
-            paper_bgcolor='rgba(0,0,0,0)',  # Fully transparent
-            plot_bgcolor='rgba(0,0,0,0)',   # Fully transparent
-            legend=dict(
-                font=dict(
-                    color='rgba(255,255,255, 0.8)'
-                )
-            ),
-            
-        )
-
-        fig = go.Figure(data=data, layout=layout)
-        plot_div = plot(fig, output_type='div', include_plotlyjs=False)
-
-        context['plot_div'] = plot_div
 
         # This section aggregates total income and expenses by category
         categories = Category.objects.filter(
@@ -234,3 +158,37 @@ class DashboardView(TemplateView):
         context['expenses_pie_div'] = expenses_pie_div
 
         return context
+
+def get_transactions(request):
+    # Retrieve the user's selection from the request; default to daily if not provided
+    range_type = request.GET.get('range_type', 'daily')
+    
+    # Map range_type to the corresponding Django Trunc function
+    trunc_mappings = {
+        'daily': TruncDay,
+        'weekly': TruncWeek,
+        'monthly': TruncMonth,
+    }
+    trunc_function = trunc_mappings.get(range_type, TruncDay)
+
+    # Query for income
+    income_by_range = Transaction.objects.filter(
+        account__user=request.user,
+        transaction_type='credit'
+    ).annotate(period=trunc_function('transaction_date')).values('period').annotate(total=Sum('amount')).order_by('period')
+
+    # Query for expenses
+    expenses_by_range = Transaction.objects.filter(
+        account__user=request.user,
+        transaction_type='debit'
+    ).annotate(period=trunc_function('transaction_date')).values('period').annotate(total=Sum('amount')).order_by('period')
+
+    # Convert querysets to lists of dicts for JSON serialization
+    income_data = list(income_by_range)
+    expenses_data = list(expenses_by_range)
+
+    # Return the data as JSON
+    return JsonResponse({
+        'income': income_data,
+        'expenses': expenses_data,
+    })
