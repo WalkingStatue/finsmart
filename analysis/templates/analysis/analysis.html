@@ -1,0 +1,86 @@
+{% extends 'base.html' %}  <!-- Extend your base layout -->
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Heading -->
+    <h2 class="text-center mb-4">Financial Analysis</h2>
+    
+    <!-- Date Range Selection -->
+    <div class="text-center mb-3">
+        <select id="dateRangeSelect" class="form-select">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+    </div>
+    
+    <!-- Plotly Chart Container -->
+    <div id="cashFlowChart"></div>
+</div>
+
+<!-- Include Plotly.js CDN -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial fetch and render
+    fetchAndUpdateChart('daily');
+
+    document.getElementById('dateRangeSelect').addEventListener('change', function() {
+        fetchAndUpdateChart(this.value);
+    });
+});
+
+function fetchAndUpdateChart(dateRange) {
+    const url = `{% url 'analysis:cash_flow_chart' %}?date_range=${dateRange}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            updateCashFlowChart(data.income, data.expenses);
+        })
+        .catch(error => console.error('Error fetching cash flow data:', error));
+}
+
+function updateCashFlowChart(incomeData, expensesData) {
+    var dates = incomeData.map(item => item.period);
+    var incomeValues = incomeData.map(item => item.total);
+    var expensesValues = expensesData.map(item => -Math.abs(item.total)); // Making expenses negative for visualization
+    
+    var trace1 = {
+        x: dates,
+        y: incomeValues,
+        name: 'Income',
+        type: 'bar',
+        marker: {
+            color: 'rgb(49,130,189)'
+        }
+    };
+    
+    var trace2 = {
+        x: dates,
+        y: expensesValues,
+        name: 'Expenses',
+        type: 'bar',
+        marker: {
+            color: 'rgb(204,204,204)'
+        }
+    };
+    
+    var data = [trace1, trace2];
+    
+    var layout = {
+        title: 'Cash Flow Analysis',
+        barmode: 'relative',
+        xaxis: {
+            title: 'Date'
+        },
+        yaxis: {
+            title: 'Amount'
+        }
+    };
+    
+    Plotly.newPlot('cashFlowChart', data, layout);
+}
+</script>
+
+{% endblock %}

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'budgets',
     'goals',
     'dashboard',
+    'analysis',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
