@@ -176,7 +176,6 @@ class DashboardView(TemplateView):
 
         context['plot_div'] = plot_div
 
-        # Step 1: Prepare data for the pie charts
         # This section aggregates total income and expenses by category
         categories = Category.objects.filter(
             transactions__account__user=self.request.user
@@ -199,7 +198,6 @@ class DashboardView(TemplateView):
             )
         ).values('name', 'total_income', 'total_expenses').order_by('name')
 
-        # Step 2: Generate Pie Charts for Income and Expenses by Category
         # These pie charts use the aggregated data to show the proportion of each category in total income and expenses
 
         # Create the income pie chart
