@@ -17,7 +17,12 @@
     <!-- Plotly Chart Container -->
     <div id="cashFlowChart"></div>
 </div>
-
+<div>
+    <div class="container mt-5">
+        <!-- Wallets Overview Chart Container -->
+    <div id="walletsOverviewChart"></div>
+    </div>
+</div>
 <!-- Include Plotly.js CDN -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -25,6 +30,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initial fetch and render
     fetchAndUpdateChart('daily');
+    fetchWalletsOverview();
 
     document.getElementById('dateRangeSelect').addEventListener('change', function() {
         fetchAndUpdateChart(this.value);
@@ -81,6 +87,40 @@ function updateCashFlowChart(incomeData, expensesData) {
     
     Plotly.newPlot('cashFlowChart', data, layout);
 }
+
+function fetchWalletsOverview() {
+    const url = `{% url 'analysis:wallets_overview' %}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            updateWalletsOverviewChart(data.wallets);
+        })
+        .catch(error => console.error('Error fetching wallets overview data:', error));
+}
+
+function updateWalletsOverviewChart(walletsData) {
+    var labels = walletsData.map(wallet => wallet.label);
+    var values = walletsData.map(wallet => wallet.value);
+
+    var data = [{
+        type: 'pie',
+        values: values,
+        labels: labels,
+        textinfo: 'label+percent',
+        insidetextorientation: 'radial'
+    }];
+
+    var layout = {
+        title: 'Wallets Overview',
+        height: 400,
+        width: 500
+    };
+
+    Plotly.newPlot('walletsOverviewChart', data, layout);
+}
 </script>
 
 {% endblock %}
+
+
+

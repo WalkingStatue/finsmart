@@ -2,12 +2,14 @@ from django.views import View
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
-from django.db.models import Sum
-from transactions.models import Transaction
+from django.db.models import Sum,F
+from transactions.models import Transaction,Wallet
 from django.views.generic import TemplateView
 from datetime import timedelta
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class CashFlowChartView(View):
+
+class CashFlowChartView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         date_range = request.GET.get('date_range', 'daily')
         user = request.user
@@ -42,11 +44,21 @@ class CashFlowChartView(View):
             'expenses': list(expenses_data)
         })
 
-class AnalysisView(TemplateView):
+class AnalysisView(LoginRequiredMixin,TemplateView):
     template_name = 'analysis/analysis.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         return context
-    
+
+class WalletsOverviewView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        wallets = Wallet.objects.filter(account__user=self.request.user).annotate(label=F('name'), value=F('balance'))
+        data = list(wallets.values('label', 'value'))
+        total_balance = sum(item['value'] for item in data)
+        return JsonResponse({
+            'wallets': data,
+            'total_balance': total_balance
+        })
