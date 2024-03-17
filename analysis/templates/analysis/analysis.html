@@ -1,126 +1,211 @@
 {% extends 'base.html' %}  <!-- Extend your base layout -->
+{% load static %}  <!-- Load static if you need to use static files -->
+{% load humanize %}
+{% load widget_tweaks %}
+
 
 {% block content %}
-<div class="container mt-5">
-    <!-- Heading -->
-    <h2 class="text-center mb-4">Financial Analysis</h2>
-    
-    <!-- Date Range Selection -->
-    <div class="text-center mb-3">
-        <select id="dateRangeSelect" class="form-select">
+<!-- Financial Analysis Heading and Dropdown -->
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900">
+    <h2 class="text-center text-3xl font-semibold text-gray-300 mb-4">Financial Analysis</h2>
+    <div class="flex justify-center mb-6">
+        <select id="dateRangeSelect" class="form-select form-select-lg bg-gray-700 text-white border-2 border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500">
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
         </select>
     </div>
-    
-    <!-- Plotly Chart Container -->
-    <div id="cashFlowChart"></div>
-</div>
-<div>
-    <div class="container mt-5">
-        <!-- Wallets Overview Chart Container -->
-    <div id="walletsOverviewChart"></div>
+
+    <!-- Cash Flow Analysis Chart -->
+    <div class="mb-8 p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-300 mb-4">Cash Flow Analysis</h3>
+        <div id="cashFlowChart" class="bg-gray-800 rounded" style="height: 400px;"></div>
+    </div>
+
+    <!-- Wallets Overview Chart -->
+    <div class="p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-300 mb-4">Wallets Overview</h3>
+        <div id="walletsOverviewChart" class="bg-gray-800 rounded" style="height: 400px;"></div>
     </div>
 </div>
-<!-- Include Plotly.js CDN -->
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initial fetch and render
-    fetchAndUpdateChart('daily');
-    fetchWalletsOverview();
-
-    document.getElementById('dateRangeSelect').addEventListener('change', function() {
-        fetchAndUpdateChart(this.value);
-    });
-});
-
-function fetchAndUpdateChart(dateRange) {
-    const url = `{% url 'analysis:cash_flow_chart' %}?date_range=${dateRange}`;
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            updateCashFlowChart(data.income, data.expenses);
-        })
-        .catch(error => console.error('Error fetching cash flow data:', error));
-}
-
-function updateCashFlowChart(incomeData, expensesData) {
-    var dates = incomeData.map(item => item.period);
-    var incomeValues = incomeData.map(item => item.total);
-    var expensesValues = expensesData.map(item => -Math.abs(item.total)); // Making expenses negative for visualization
-    
-    var trace1 = {
-        x: dates,
-        y: incomeValues,
-        name: 'Income',
-        type: 'bar',
-        marker: {
-            color: 'rgb(49,130,189)'
-        }
-    };
-    
-    var trace2 = {
-        x: dates,
-        y: expensesValues,
-        name: 'Expenses',
-        type: 'bar',
-        marker: {
-            color: 'rgb(204,204,204)'
-        }
-    };
-    
-    var data = [trace1, trace2];
-    
-    var layout = {
-        title: 'Cash Flow Analysis',
-        barmode: 'relative',
-        xaxis: {
-            title: 'Date'
-        },
-        yaxis: {
-            title: 'Amount'
-        }
-    };
-    
-    Plotly.newPlot('cashFlowChart', data, layout);
-}
-
-function fetchWalletsOverview() {
-    const url = `{% url 'analysis:wallets_overview' %}`;
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            updateWalletsOverviewChart(data.wallets);
-        })
-        .catch(error => console.error('Error fetching wallets overview data:', error));
-}
-
-function updateWalletsOverviewChart(walletsData) {
-    var labels = walletsData.map(wallet => wallet.label);
-    var values = walletsData.map(wallet => wallet.value);
-
-    var data = [{
-        type: 'pie',
-        values: values,
-        labels: labels,
-        textinfo: 'label+percent',
-        insidetextorientation: 'radial'
-    }];
-
-    var layout = {
-        title: 'Wallets Overview',
-        height: 400,
-        width: 500
-    };
-
-    Plotly.newPlot('walletsOverviewChart', data, layout);
-}
-</script>
-
 {% endblock %}
 
+{% block javascript%}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial fetch and render
+            fetchAndUpdateChart('daily');
+            fetchWalletsOverview();
+        
+            document.getElementById('dateRangeSelect').addEventListener('change', function() {
+                fetchAndUpdateChart(this.value);
+            });
+        });
+        
+        function fetchAndUpdateChart(dateRange) {
+            const url = `{% url 'analysis:cash_flow_chart' %}?date_range=${dateRange}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    updateCashFlowChart(data.income, data.expenses);
+                })
+                .catch(error => console.error('Error fetching cash flow data:', error));
+        }
+        
+        function updateCashFlowChart(incomeData, expensesData) {
+            var dates = incomeData.map(item => item.period);
+            var incomeValues = incomeData.map(item => item.total);
+            var expensesValues = expensesData.map(item => -Math.abs(item.total)); // Expenses are negative for visualization
+            
+            var trace1 = {
+                x: dates,
+                y: incomeValues,
+                name: 'Income',
+                type: 'bar',
+                marker: {
+                    color: 'rgba(49,130,189, 0.7)' // Semi-transparent blue
+                }
+            };
+            
+            var trace2 = {
+                x: dates,
+                y: expensesValues,
+                name: 'Expenses',
+                type: 'bar',
+                marker: {
+                    color: 'rgba(255,127,14, 0.7)' // Semi-transparent orange
+                }
+            };
+            
+            var layout = {
+                title: {
+                    text: 'Cash Flow Analysis',
+                    font: {
+                        size: 20,
+                        color: 'white'
+                    }
+                },
+                barmode: 'overlay', // Use overlay mode for individual bars to be visible on top of each other
+                xaxis: {
+                    title: {
+                        text: 'Date',
+                        font: {
+                            size: 18,
+                            color: 'white'
+                        }
+                    },
+                    tickfont: {
+                        color: 'white'
+                    },
+                    showgrid: true,
+                    gridcolor: 'rgba(255,255,255,0.3)'
+                },
+                yaxis: {
+                    title: {
+                        text: 'Amount',
+                        font: {
+                            size: 18,
+                            color: 'white'
+                        }
+                    },
+                    tickfont: {
+                        color: 'white'
+                    },
+                    showgrid: true,
+                    gridcolor: 'rgba(255,255,255,0.3)'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)', // Fully transparent
+                plot_bgcolor: 'rgba(0,0,0,0)', // Dark background color for the plot area
+                legend: {
+                    font: {
+                        color: 'white'
+                    }
+                },
+                margin: {
+                    l: 60,
+                    r: 30,
+                    t: 65,
+                    b: 50
+                }
+            };
+            
+            var config = {
+                responsive: true,
+                displayModeBar: true
+            };
+            
+            Plotly.newPlot('cashFlowChart', [trace1, trace2], layout, config);
+        }
 
-
+        
+        function fetchWalletsOverview() {
+            const url = `{% url 'analysis:wallets_overview' %}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    updateWalletsOverviewChart(data.wallets);
+                })
+                .catch(error => console.error('Error fetching wallets overview data:', error));
+        }
+        
+        function updateWalletsOverviewChart(walletsData) {
+            var labels = walletsData.map(wallet => wallet.label);
+            var values = walletsData.map(wallet => wallet.value);
+        
+            var data = [{
+                type: 'pie',
+                values: values,
+                labels: labels,
+                textinfo: 'label+percent',
+                insidetextorientation: 'radial',
+                hole: .4, // If you want a donut chart
+                marker: {
+                    colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'] // Colors for each slice
+                },
+                hoverinfo: 'label+percent',
+                textfont: {
+                    color: 'white'
+                }
+            }];
+        
+            var layout = {
+                title: {
+                    text: 'Wallets Overview',
+                    font: {
+                        size: 20,
+                        color: 'white'
+                    }
+                },
+                height: 400,
+                width: 500,
+                showlegend: true,
+                legend: {
+                    font: {
+                        color: 'white'
+                    },
+                    orientation: 'h',
+                    xanchor: 'center',
+                    x: 0.5,
+                    y: -0.1
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)', // Fully transparent background color
+                plot_bgcolor: 'rgba(0,0,0,0)', // Fully transparent background color
+                margin: {
+                    l: 0,
+                    r: 0,
+                    t: 50, // Adjust top margin to give space for the title
+                    b: 0
+                }
+            };
+        
+            var config = {
+                responsive: true,
+                displayModeBar: true
+            };
+        
+            Plotly.newPlot('walletsOverviewChart', data, layout, config);
+        }
+        
+        </script>
+{% endblock %}
