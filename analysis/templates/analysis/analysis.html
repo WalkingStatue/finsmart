@@ -1,211 +1,365 @@
-{% extends 'base.html' %}  <!-- Extend your base layout -->
-{% load static %}  <!-- Load static if you need to use static files -->
-{% load humanize %}
-{% load widget_tweaks %}
-
-
+{% extends 'base.html' %} {% load humanize %} {% load widget_tweaks %} 
 {% block content %}
-<!-- Financial Analysis Heading and Dropdown -->
-<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-900">
-    <h2 class="text-center text-3xl font-semibold text-gray-300 mb-4">Financial Analysis</h2>
-    <div class="flex justify-center mb-6">
-        <select id="dateRangeSelect" class="form-select form-select-lg bg-gray-700 text-white border-2 border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500">
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-        </select>
-    </div>
+<!-- Financial Analysis Heading -->
+<div class="bg-gray-900 rounded-lg shadow-xl max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <h2 class="text-center text-4xl font-bold text-gray-100 mb-10">Financial Analysis</h2>
 
-    <!-- Cash Flow Analysis Chart -->
-    <div class="mb-8 p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold text-gray-300 mb-4">Cash Flow Analysis</h3>
-        <div id="cashFlowChart" class="bg-gray-800 rounded" style="height: 400px;"></div>
-    </div>
-
+  <div class="flex flex-wrap justify-between -mx-2">
     <!-- Wallets Overview Chart -->
-    <div class="p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold text-gray-300 mb-4">Wallets Overview</h3>
-        <div id="walletsOverviewChart" class="bg-gray-800 rounded" style="height: 400px;"></div>
+    <div class="w-full md:w-1/2 px-2 mb-4">
+      <div class="mb-8 p-6 rounded-xl shadow-2xl bg-gray-800 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl">
+        <h3 class="text-2xl font-semibold text-white mb-6">Wallets Overview</h3>
+        <div id="walletsOverviewChart" class="rounded-xl h-96"></div>
+      </div>
     </div>
+
+    <!-- Budget Utilization Chart -->
+    <div class="w-full md:w-1/2 px-2">
+      <div class="p-6 rounded-xl shadow-lg bg-gray-800">
+        <h3 class="text-xl font-semibold text-white mb-4">Budget Utilization</h3>
+        <div id="budgetUtilizationChart" class="rounded-xl h-96"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cash Flow Analysis Chart -->
+  <div class="p-6 rounded-xl shadow-2xl bg-gray-800 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl">
+    <div class="flex flex-wrap items-center justify-between mb-6">
+      <h3 class="text-2xl font-semibold text-white">Cash Flow Analysis</h3>
+      <div>
+        <select id="dateRangeSelect" class="bg-gray-700 text-white text-lg rounded-lg px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out hover:bg-gray-600">
+          <option value="daily" selected>Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+    </div>
+    <div id="cashFlowChart" class="rounded-xl h-96"></div>
+  </div>
+
+  <!-- Spending Trend Chart -->
+  <div class="mt-8 p-6 rounded-xl shadow-2xl bg-gray-800 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl">
+    <h3 class="text-2xl font-semibold text-white mb-6">Spending Trend</h3>
+    <div id="spendingTrendsChart" class="rounded-xl h-96"></div>
+  </div>
 </div>
 {% endblock %}
 
+
 {% block javascript%}
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initial fetch and render
-            fetchAndUpdateChart('daily');
-            fetchWalletsOverview();
-        
-            document.getElementById('dateRangeSelect').addEventListener('change', function() {
-                fetchAndUpdateChart(this.value);
-            });
-        });
-        
-        function fetchAndUpdateChart(dateRange) {
-            const url = `{% url 'analysis:cash_flow_chart' %}?date_range=${dateRange}`;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    updateCashFlowChart(data.income, data.expenses);
-                })
-                .catch(error => console.error('Error fetching cash flow data:', error));
-        }
-        
-        function updateCashFlowChart(incomeData, expensesData) {
-            var dates = incomeData.map(item => item.period);
-            var incomeValues = incomeData.map(item => item.total);
-            var expensesValues = expensesData.map(item => -Math.abs(item.total)); // Expenses are negative for visualization
-            
-            var trace1 = {
-                x: dates,
-                y: incomeValues,
-                name: 'Income',
-                type: 'bar',
-                marker: {
-                    color: 'rgba(49,130,189, 0.7)' // Semi-transparent blue
-                }
-            };
-            
-            var trace2 = {
-                x: dates,
-                y: expensesValues,
-                name: 'Expenses',
-                type: 'bar',
-                marker: {
-                    color: 'rgba(255,127,14, 0.7)' // Semi-transparent orange
-                }
-            };
-            
-            var layout = {
-                title: {
-                    text: 'Cash Flow Analysis',
-                    font: {
-                        size: 20,
-                        color: 'white'
-                    }
-                },
-                barmode: 'overlay', // Use overlay mode for individual bars to be visible on top of each other
-                xaxis: {
-                    title: {
-                        text: 'Date',
-                        font: {
-                            size: 18,
-                            color: 'white'
-                        }
-                    },
-                    tickfont: {
-                        color: 'white'
-                    },
-                    showgrid: true,
-                    gridcolor: 'rgba(255,255,255,0.3)'
-                },
-                yaxis: {
-                    title: {
-                        text: 'Amount',
-                        font: {
-                            size: 18,
-                            color: 'white'
-                        }
-                    },
-                    tickfont: {
-                        color: 'white'
-                    },
-                    showgrid: true,
-                    gridcolor: 'rgba(255,255,255,0.3)'
-                },
-                paper_bgcolor: 'rgba(0,0,0,0)', // Fully transparent
-                plot_bgcolor: 'rgba(0,0,0,0)', // Dark background color for the plot area
-                legend: {
-                    font: {
-                        color: 'white'
-                    }
-                },
-                margin: {
-                    l: 60,
-                    r: 30,
-                    t: 65,
-                    b: 50
-                }
-            };
-            
-            var config = {
-                responsive: true,
-                displayModeBar: true
-            };
-            
-            Plotly.newPlot('cashFlowChart', [trace1, trace2], layout, config);
-        }
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchAndUpdateChart("daily");
+    fetchWalletsOverview();
+    fetchSpendingTrends();
+    fetchBudgetUtilization();
 
-        
-        function fetchWalletsOverview() {
-            const url = `{% url 'analysis:wallets_overview' %}`;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    updateWalletsOverviewChart(data.wallets);
-                })
-                .catch(error => console.error('Error fetching wallets overview data:', error));
+    document
+      .getElementById("dateRangeSelect")
+      .addEventListener("change", function () {
+        fetchAndUpdateChart(this.value);
+        // Uncomment the next line if you want the spending trends chart to also update with the date range
+        //fetchSpendingTrends();
+      });
+
+    document
+      .querySelectorAll('#categorySelection input[type="checkbox"]')
+      .forEach((checkbox) => {
+        checkbox.addEventListener("change", fetchSpendingTrends);
+      });
+  });
+
+  function fetchAndUpdateChart(dateRange) {
+    const url = `/analysis/api/cash-flow-chart/?date_range=${dateRange}`;
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        updateCashFlowChart(data.income, data.expenses);
+      })
+      .catch((error) => console.error("Error fetching cash flow data:", error));
+  }
+
+  function updateCashFlowChart(incomeData, expensesData) {
+    var dates = incomeData.map((item) => item.period);
+    var incomeValues = incomeData.map((item) => item.total);
+    var expensesValues = expensesData.map((item) => -Math.abs(item.total)); // Expenses are negative for visualization
+
+    var trace1 = {
+      x: dates,
+      y: incomeValues,
+      name: "Income",
+      type: "bar",
+      marker: {
+        color: "rgba(49,130,189, 0.7)", // Semi-transparent blue
+      },
+    };
+
+    var trace2 = {
+      x: dates,
+      y: expensesValues,
+      name: "Expenses",
+      type: "bar",
+      marker: {
+        color: "rgba(255,127,14, 0.7)", // Semi-transparent orange
+      },
+    };
+
+    var layout = {
+      title: {
+        //text: 'Cash Flow Analysis',
+        font: {
+          size: 20,
+          color: "white",
+        },
+      },
+      barmode: "overlay", // Use overlay mode for individual bars to be visible on top of each other
+      xaxis: {
+        title: {
+          text: "Date",
+          font: {
+            size: 18,
+            color: "white",
+          },
+        },
+        tickfont: {
+          color: "white",
+        },
+        showgrid: true,
+        gridcolor: "rgba(255,255,255,0.3)",
+      },
+      yaxis: {
+        title: {
+          text: "Amount",
+          font: {
+            size: 18,
+            color: "white",
+          },
+        },
+        tickfont: {
+          color: "white",
+        },
+        showgrid: true,
+        gridcolor: "rgba(255,255,255,0.3)",
+      },
+      paper_bgcolor: "rgba(0,0,0,0)", // Fully transparent
+      plot_bgcolor: "rgba(0,0,0,0)", // Dark background color for the plot area
+      legend: {
+        font: {
+          color: "white",
+        },
+      },
+      margin: {
+        l: 60,
+        r: 30,
+        t: 65,
+        b: 50,
+      },
+    };
+
+    var config = {
+      responsive: true,
+      modeBarButtonsToRemove: [
+        "pan2d",
+        "select2d",
+        "lasso2d",
+        "autoScale2d",
+        "hoverClosestCartesian",
+        "hoverCompareCartesian",
+        "toggleSpikelines",
+      ],
+      modeBarButtonsToAdd: ["hoverCompareCartesian"],
+    };
+
+    Plotly.newPlot("cashFlowChart", [trace1, trace2], layout, config);
+  }
+
+  function fetchSpendingTrends() {
+    const selectedCategories = Array.from(
+      document.querySelectorAll(
+        '#categorySelection input[type="checkbox"]:checked'
+      )
+    )
+      .map((c) => c.value)
+      .join(",");
+    const timePeriod = document.getElementById("dateRangeSelect").value; // Ensure this exists or handle its absence
+    const url = `/analysis/api/spending-trends/?time_period=${timePeriod}&category_ids=${selectedCategories}`;
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        updateSpendingTrendsChart(data["trends_data"]);
+      })
+      .catch((error) =>
+        console.error("Error fetching spending trends data:", error)
+      );
+  }
+
+  function fetchWalletsOverview() {
+    const url = `{% url 'analysis:wallets_overview' %}`;
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        updateWalletsOverviewChart(data.wallets);
+      })
+      .catch((error) =>
+        console.error("Error fetching wallets overview data:", error)
+      );
+  }
+
+  function updateWalletsOverviewChart(walletsData) {
+    var labels = walletsData.map((wallet) => wallet.label);
+    var values = walletsData.map((wallet) => wallet.value);
+
+    var data = [
+      {
+        type: "pie",
+        values: values,
+        labels: labels,
+        textinfo: "label+percent",
+        insidetextorientation: "radial",
+        hole: 0.4, // If you want a donut chart
+        marker: {
+          colors: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"], // Colors for each slice
+        },
+        hoverinfo: "label+percent",
+        textfont: {
+          color: "white",
+        },
+      },
+    ];
+
+    var layout = {
+      title: {
+        //text: 'Wallets Overview',
+        font: {
+          size: 20,
+          color: "white",
+        },
+      },
+      height: 400,
+      width: 500,
+      showlegend: true,
+      legend: {
+        font: {
+          color: "white",
+        },
+        orientation: "h",
+        xanchor: "center",
+        x: 0.5,
+        y: -0.1,
+      },
+      paper_bgcolor: "rgba(0,0,0,0)", // Fully transparent background color
+      plot_bgcolor: "rgba(0,0,0,0)", // Fully transparent background color
+      margin: {
+        l: 0,
+        r: 0,
+        t: 50, // Adjust top margin to give space for the title
+        b: 0,
+      },
+    };
+
+    var config = {
+      responsive: true,
+    };
+
+    Plotly.newPlot("walletsOverviewChart", data, layout, config);
+  }
+
+  function updateSpendingTrendsChart(trendsData) {
+    const traces = trendsData.map((categoryData) => ({
+      x: categoryData.trends.map((trend) => new Date(trend.period)),
+      y: categoryData.trends.map((trend) => trend.total),
+      type: "scatter",
+      mode: "lines+markers",
+      name: categoryData.category,
+    }));
+
+    const layout = {
+      //title: 'Spending Trends Over Time',
+      xaxis: { title: "Time", type: "date" },
+      yaxis: { title: "Amount Spent" },
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      font: { color: "#FFFFFF" },
+      margin: { t: 50 }, // Adjust the top margin if necessary
+    };
+
+    var config = {
+      responsive: true,
+      modeBarButtonsToRemove: [
+        "pan2d",
+        "select2d",
+        "lasso2d",
+        "autoScale2d",
+        "hoverClosestCartesian",
+        "hoverCompareCartesian",
+        "toggleSpikelines",
+      ],
+      modeBarButtonsToAdd: ["hoverCompareCartesian"],
+    };
+
+    Plotly.newPlot("spendingTrendsChart", traces, layout, config);
+  }
+  function fetchBudgetUtilization() {
+    const url = "/analysis/api/budget-utilization/"; // Ensure this URL matches your Django URL configuration
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        function updateWalletsOverviewChart(walletsData) {
-            var labels = walletsData.map(wallet => wallet.label);
-            var values = walletsData.map(wallet => wallet.value);
-        
-            var data = [{
-                type: 'pie',
-                values: values,
-                labels: labels,
-                textinfo: 'label+percent',
-                insidetextorientation: 'radial',
-                hole: .4, // If you want a donut chart
-                marker: {
-                    colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'] // Colors for each slice
-                },
-                hoverinfo: 'label+percent',
-                textfont: {
-                    color: 'white'
-                }
-            }];
-        
-            var layout = {
-                title: {
-                    text: 'Wallets Overview',
-                    font: {
-                        size: 20,
-                        color: 'white'
-                    }
-                },
-                height: 400,
-                width: 500,
-                showlegend: true,
-                legend: {
-                    font: {
-                        color: 'white'
-                    },
-                    orientation: 'h',
-                    xanchor: 'center',
-                    x: 0.5,
-                    y: -0.1
-                },
-                paper_bgcolor: 'rgba(0,0,0,0)', // Fully transparent background color
-                plot_bgcolor: 'rgba(0,0,0,0)', // Fully transparent background color
-                margin: {
-                    l: 0,
-                    r: 0,
-                    t: 50, // Adjust top margin to give space for the title
-                    b: 0
-                }
-            };
-        
-            var config = {
-                responsive: true,
-                displayModeBar: true
-            };
-        
-            Plotly.newPlot('walletsOverviewChart', data, layout, config);
+        return response.json();
+      })
+      .then((data) => {
+        updateBudgetUtilizationChart(data["budget_data"]);
+      })
+      .catch((error) => {
+        console.error("Error fetching budget utilization data:", error);
+      });
+  }
+  function generateColors(n) {
+    const colors = [];
+    for (let i = 0; i < n; i++) {
+        // Generate a color in HSL format varying the hue
+        const hue = i * (360 / n); // This spreads the colors evenly across the color wheel
+        colors.push(`hsl(${hue}, 100%, 70%)`); // Adjust saturation and lightness as needed
+    }
+    return colors;
+}
+  function updateBudgetUtilizationChart(budgetData) {
+
+    const data = [{
+      labels: budgetData.map(item => item.name),
+      values: budgetData.map(item => item.amount_spent), // or `item.total_budget` depending on what you want to show
+      type: 'pie',
+      textinfo: 'label+percent',
+      textposition: 'outside',
+      automargin: true,
+      marker: {
+        colors: generateColors(budgetData.length), // Slice the colors array to match the number of budgets
+        line: {
+          color: 'white',
+          width: 1
         }
-        
-        </script>
+      },
+      hoverinfo: 'label+value+percent',
+    }];
+
+    const layout = {
+        //title: 'Budget Utilization',
+        showlegend: true,
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#FFFFFF' }
+    };
+
+    const config = {
+        responsive: true,
+        displayModeBar: true // Set to false to hide the modebar
+    };
+
+    Plotly.newPlot('budgetUtilizationChart', data, layout, config);
+}
+
+</script>
 {% endblock %}
