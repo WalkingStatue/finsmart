@@ -6,6 +6,11 @@ from django.utils import timezone
 from .forms import GoalForm
 from datetime import date
 from .models import Goal
+from django.views import View
+from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 
 class GoalListView(LoginRequiredMixin, ListView):
     model = Goal
@@ -57,3 +62,28 @@ class GoalDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return super().get_queryset().filter(account__user=self.request.user)
+
+class GoalTransactionsAPIView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        # Get the budget by pk provided in the URL
+        goal = get_object_or_404(Goal, pk=kwargs['pk'], account__user=request.user)
+
+        # Get the transactions related to the budget
+        transactions = goal.transactions.filter(transaction_type='credit').order_by('-transaction_date')
+
+
+        # Prepare the transactions for the template
+        transactions_data = [{
+            'description': transaction.description,
+            'transaction_type': transaction.get_transaction_type_display(),  # Use get_FOO_display() for human-readable name
+            'category_name': transaction.category.name if transaction.category else 'N/A',
+            'transaction_date': transaction.transaction_date.strftime('%Y-%m-%d'),  # Adjusted for full datetime
+            'amount': transaction.amount
+        } for transaction in transactions]
+
+
+        # Render the transactions template
+        html = render_to_string('goals/goal_transactions.html', {'transactions': transactions_data})
+
+        return HttpResponse(html)

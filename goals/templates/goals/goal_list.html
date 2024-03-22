@@ -11,7 +11,8 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for goal in goals %}
-        <div>
+        <div class="goal-item bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out"
+        data-goal-id="{{ goal.pk }}">
             {% if goal.remaining_budget_percentage == 100 %}
                 <div class="bg-green-600 text-white px-4 py-3 rounded-t-xl mb-4" role="alert">
                     <strong class="font-bold">Congratulations!</strong>
@@ -54,5 +55,40 @@
             <p class="text-white text-center w-full">No Goals to display.</p>
         {% endfor %}
     </div>
+    <div id="transactions-container" class="mt-8">
+        <!-- The transactions content will go here -->
+    </div>
 </div>
+{% endblock %}
+{% block javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Attach click event listeners to each budget item
+        document.querySelectorAll('.goal-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const goalId = this.getAttribute('data-goal-id');
+                fetchTransactionsForBudget(goalId);
+            });
+        });
+    });
+    
+    function fetchTransactionsForBudget(goalId) {
+        // Fetch the transactions HTML from the server
+        const url = `api/goals/${goalId}/transactions/`;
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Assuming you have a div with id="transactions-container" to display the transactions
+                document.getElementById('transactions-container').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error fetching transactions:', error);
+            });
+    }
+    </script>
 {% endblock %}

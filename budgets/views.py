@@ -5,6 +5,11 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import BudgetForm  
 from django.utils import timezone
+from django.views import View
+from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 class BudgetListView(LoginRequiredMixin, ListView):
     model = Budget
     context_object_name = 'budgets'
@@ -12,7 +17,7 @@ class BudgetListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         today = timezone.now().date()
-        queryset = Budget.objects.filter(account__user=self.request.user)
+        queryset = Budget.objects.filter(account__user=self.request.user).prefetch_related('transactions')
 
         for budget in queryset:
             # Calculate the number of days remaining in the budget period
@@ -30,7 +35,8 @@ class BudgetListView(LoginRequiredMixin, ListView):
             # Attach the calculations to the budget object
             budget.days_remaining = days_remaining
             budget.daily_spendable = daily_spendable
-        
+            # Attach the transactions to the budget object
+            budget.transactions_list = budget.transactions.all()
         return queryset
 
 
@@ -61,3 +67,28 @@ class BudgetDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return super().get_queryset().filter(account__user=self.request.user)
+
+class BudgetTransactionsAPIView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        # Get the budget by pk provided in the URL
+        budget = get_object_or_404(Budget, pk=kwargs['pk'], account__user=request.user)
+
+        # Get the transactions related to the budget
+        transactions = budget.transactions.filter(transaction_type='debit').order_by('-transaction_date')
+
+
+        # Prepare the transactions for the template
+        transactions_data = [{
+            'description': transaction.description,
+            'transaction_type': transaction.get_transaction_type_display(),  # Use get_FOO_display() for human-readable name
+            'category_name': transaction.category.name if transaction.category else 'N/A',
+            'transaction_date': transaction.transaction_date.strftime('%Y-%m-%d'),  # Adjusted for full datetime
+            'amount': transaction.amount
+        } for transaction in transactions]
+
+
+        # Render the transactions template
+        html = render_to_string('budgets/budget_transactions.html', {'transactions': transactions_data})
+
+        return HttpResponse(html)
