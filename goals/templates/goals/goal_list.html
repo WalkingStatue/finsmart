@@ -67,12 +67,13 @@
         document.querySelectorAll('.goal-item').forEach(item => {
             item.addEventListener('click', function() {
                 const goalId = this.getAttribute('data-goal-id');
-                fetchTransactionsForBudget(goalId);
+                const goalName = this.querySelector('h3').textContent;
+                fetchTransactionsForBudget(goalId, goalName);
             });
         });
     });
     
-    function fetchTransactionsForBudget(goalId) {
+    function fetchTransactionsForBudget(goalId, goalName) {
         // Fetch the transactions HTML from the server
         const url = `api/goals/${goalId}/transactions/`;
         fetch(url)
@@ -83,8 +84,8 @@
                 return response.text();
             })
             .then(html => {
-                // Assuming you have a div with id="transactions-container" to display the transactions
-                document.getElementById('transactions-container').innerHTML = html;
+                const transactionsContainer = document.getElementById('transactions-container');
+                transactionsContainer.innerHTML = `<h2 class="text-xl font-semibold text-white">Transactions for ${goalName}</h2>` + html;
             })
             .catch(error => {
                 console.error('Error fetching transactions:', error);
