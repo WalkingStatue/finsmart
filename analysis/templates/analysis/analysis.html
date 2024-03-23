@@ -1,31 +1,36 @@
 {% extends 'base.html' %} {% load humanize %} {% load widget_tweaks %} 
 {% block content %}
 <!-- Financial Analysis Heading -->
-<div class="bg-gray-900 rounded-lg shadow-xl max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-  <h2 class="text-center text-4xl font-bold text-gray-100 mb-10">Financial Analysis</h2>
+<div class="bg-gray-900 text-gray-100 rounded-lg shadow-xl max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-10">
+    <h2 class="text-4xl font-bold">Financial Analysis</h2>
+    <button onclick="location.href='{% url 'export:export_csv' %}'" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Export Data
+    </button>
+  </div>
 
-  <div class="flex flex-wrap justify-between -mx-2">
+  <div class="flex flex-wrap -mx-2 mb-4">
     <!-- Wallets Overview Chart -->
-    <div class="w-full md:w-1/2 px-2 mb-4">
-      <div class="mb-8 p-6 rounded-xl shadow-2xl bg-gray-800 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl">
-        <h3 class="text-2xl font-semibold text-white mb-6">Wallets Overview</h3>
-        <div id="walletsOverviewChart" class="rounded-xl h-96"></div>
-      </div>
+    <div class="md:w-1/2 px-2 mb-4">
+        <div class="p-6 rounded-xl shadow-2xl bg-gray-800">
+            <h3 class="text-2xl font-semibold mb-6">Wallets Overview</h3>
+            <div id="walletsOverviewChart" class="rounded-xl h-96"></div>
+        </div>
     </div>
 
     <!-- Budget Utilization Chart -->
-    <div class="w-full md:w-1/2 px-2">
-      <div class="p-6 rounded-xl shadow-lg bg-gray-800">
-        <h3 class="text-xl font-semibold text-white mb-4">Budget Utilization</h3>
-        <div id="budgetUtilizationChart" class="rounded-xl h-96"></div>
-      </div>
+    <div class="md:w-1/2 px-2 mb-4">
+        <div class="p-6 rounded-xl shadow-lg bg-gray-800">
+            <h3 class="text-2xl font-semibold mb-4">Budget Utilization</h3>
+            <div id="budgetUtilizationChart" class="rounded-xl h-96"></div>
+        </div>
     </div>
-  </div>
+</div>
 
   <!-- Cash Flow Analysis Chart -->
-  <div class="p-6 rounded-xl shadow-2xl bg-gray-800 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl">
+  <div class="p-6 rounded-xl shadow-2xl bg-gray-800 mt-4">
     <div class="flex flex-wrap items-center justify-between mb-6">
-      <h3 class="text-2xl font-semibold text-white">Cash Flow Analysis</h3>
+      <h3 class="text-2xl font-semibold">Cash Flow Analysis</h3>
       <div>
         <select id="dateRangeSelect" class="bg-gray-700 text-white text-lg rounded-lg px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out hover:bg-gray-600">
           <option value="daily" selected>Daily</option>
@@ -38,12 +43,13 @@
   </div>
 
   <!-- Spending Trend Chart -->
-  <div class="mt-8 p-6 rounded-xl shadow-2xl bg-gray-800 transition duration-500 ease-in-out transform hover:-translate-y-1 hover:shadow-2xl">
-    <h3 class="text-2xl font-semibold text-white mb-6">Spending Trend</h3>
+  <div class="p-6 rounded-xl shadow-2xl bg-gray-800 mt-4">
+    <h3 class="text-2xl font-semibold mb-6">Spending Trend</h3>
     <div id="spendingTrendsChart" class="rounded-xl h-96"></div>
   </div>
 </div>
 {% endblock %}
+
 
 
 {% block javascript%}
@@ -343,14 +349,39 @@
         }
       },
       hoverinfo: 'label+value+percent',
+      textfont: {
+        color: "white",
+      }
     }];
 
-    const layout = {
-        //title: 'Budget Utilization',
-        showlegend: true,
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { color: '#FFFFFF' }
+    var layout = {
+      title: {
+        //text: 'Wallets Overview',
+        font: {
+          size: 20,
+          color: "white",
+        },
+      },
+      height: 400,
+      width: 500,
+      showlegend: true,
+      legend: {
+        font: {
+          color: "white",
+        },
+        orientation: "h",
+        xanchor: "center",
+        x: 0.5,
+        y: -0.1,
+      },
+      paper_bgcolor: "rgba(0,0,0,0)", // Fully transparent background color
+      plot_bgcolor: "rgba(0,0,0,0)", // Fully transparent background color
+      margin: {
+        l: 0,
+        r: 0,
+        t: 50, // Adjust top margin to give space for the title
+        b: 0,
+      },
     };
 
     const config = {
