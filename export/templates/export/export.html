@@ -1,17 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load widget_tweaks %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <form method="post" action="{% url 'export:export_csv' %}" class="bg-gray-800 p-6 rounded-lg shadow space-y-8">
+    <form method="post" id="exportForm" class="bg-gray-800 p-6 rounded-lg shadow space-y-8">
         {% csrf_token %}
         <div class="text-white">
             <h3 class="text-lg leading-6 font-medium text-white">Export Transactions</h3>
             <p class="mt-1 text-sm text-gray-400">
-                Select the date range for the transactions you want to export.
+                Select the date range and format for the transactions you want to export.
             </p>
         </div>
+
+        <!-- Date range inputs -->
         <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <!-- Start Date -->
             <div class="sm:col-span-3">
                 <label for="start_date" class="block text-sm font-medium text-gray-300">
                     Start Date
@@ -21,6 +25,7 @@
                 </div>
             </div>
 
+            <!-- End Date -->
             <div class="sm:col-span-3">
                 <label for="end_date" class="block text-sm font-medium text-gray-300">
                     End Date
@@ -31,6 +36,18 @@
             </div>
         </div>
 
+        <!-- Export Format Selection -->
+        <div class="text-white">
+            <label for="export_format" class="block text-sm font-medium text-gray-300">
+                Export Format
+            </label>
+            <select id="export_format" name="export_format" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-600 rounded-md bg-gray-700 text-white shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
         <div class="pt-5">
             <div class="flex justify-end">
                 <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -40,4 +57,21 @@
         </div>
     </form>
 </div>
+
+
+    
+{% endblock %}
+{% block javascript %}
+<script>
+    document.getElementById('export_format').addEventListener('change', function() {
+        var form = document.getElementById('exportForm');
+        var selectedFormat = this.value;
+        // Adjust the form action based on the selected export format, matching the URL names
+        if(selectedFormat === 'csv') {
+            form.action = '{% url 'export:export_csv' %}';
+        } else if(selectedFormat === 'pdf') {
+            form.action = '{% url 'export:export_pdf' %}';
+        }
+    });
+    </script>
 {% endblock %}
