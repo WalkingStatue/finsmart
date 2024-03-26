@@ -9,8 +9,9 @@ import plotly.graph_objs as go
 from plotly.offline import plot
 from django.http import JsonResponse
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin,TemplateView):
     template_name = 'dashboard/dashboard.html'
 
     def get_context_data(self, **kwargs):

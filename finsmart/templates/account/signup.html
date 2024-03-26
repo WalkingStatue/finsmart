@@ -2,9 +2,10 @@
 {% load widget_tweaks %}
 {% load static %}
 {% load i18n %}
-{% block title %} Signup | FinSmart {% endblock %}
-{% block content %}
 
+{% block title %} Signup | FinSmart {% endblock %}
+
+{% block content %}
 <div class="flex justify-center items-center min-h-screen bg-gray-100">
   <div class="w-full max-w-lg p-8 space-y-8 bg-gray-800 rounded-lg shadow">
     <div>
@@ -20,28 +21,44 @@
         <!-- Email Field -->
         <div>
           <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
-          {{form.email|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"}}
-          {{ form.email.errors }}        
+          {{ form.email|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" }}
+          {% for error in form.email.errors %}
+            <p class="text-red-500 text-xs italic">{{ error }}</p>
+          {% endfor %}
         </div>
         <!-- Username Field -->
         <div>
           <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
-           {{form.username |add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"}}
-          {{ form.username.errors }}
+          {{ form.username|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" }}
+          {% for error in form.username.errors %}
+            <p class="text-red-500 text-xs italic">{{ error }}</p>
+          {% endfor %}
         </div>
         <!-- Password Field -->
         <div>
           <label for="password1" class="block text-sm font-medium text-gray-300">Password</label>
-           {{form.password1|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"}}
-          {{ form.password1.errors }}
+          {{ form.password1|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" }}
+          {% for error in form.password1.errors %}
+            <p class="text-red-500 text-xs italic">{{ error }}</p>
+          {% endfor %}
         </div>
         <!-- Confirm Password Field -->
         <div>
           <label for="password2" class="block text-sm font-medium text-gray-300">Confirm Password</label>
-           {{form.password2|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"}}
-          {{ form.password2.errors }}
+          {{ form.password2|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" }}
+          {% for error in form.password2.errors %}
+            <p class="text-red-500 text-xs italic">{{ error }}</p>
+          {% endfor %}
         </div>
       </div>
+      <!-- Non-Field Errors -->
+      {% if form.non_field_errors %}
+        <div class="text-red-500 text-xs italic">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
       <!-- Submit Button -->
       <div>
         <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -51,5 +68,4 @@
     </form>
   </div>
 </div>
-
 {% endblock %}

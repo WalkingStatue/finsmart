@@ -5,8 +5,19 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+   <!-- Messages Display -->
+   {% if messages %}
+   <ul class="messages">
+     {% for message in messages %}
+       <li class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+         {{ message }}
+       </li>
+     {% endfor %}
+   </ul>
+   {% endif %}
+
   <!-- Wallets Display -->
-  <div class="flex flex-wrap gap-4 mb-6">
+  <div class="flex flex-wrap gap-4 mb-6 mt-2">
     {% for wallet in wallets %}
     <!-- Corrected approach to determine if the wallet is active -->
    <a href="{% url 'transactions:wallet_transactions' pk=wallet.pk %}" class="bg-gray-900 rounded-xl p-6 flex flex-col items-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer text-center no-underline">

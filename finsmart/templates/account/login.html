@@ -1,6 +1,5 @@
 {% extends "account/base_entrance.html" %}
 {% load i18n %}
-{% load static %}
 {% load widget_tweaks %}
 {% block title %} {% trans "Login" %} | FinSmart {% endblock %}
 {% block content %}
@@ -37,9 +36,9 @@
             {% endif %}
 
             <div>
-                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
-                    {% trans "Log in" %}
-                </button>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Login
+                  </button>
             </div>
             <div class="flex items-center justify-between">
                 <div class="text-sm">

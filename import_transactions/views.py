@@ -38,12 +38,8 @@ class ImportTransactionsView(View):
                 category_name = row.get('Category')
                 budget_name = row.get('Budget')
                 goal_name = row.get('Goal')
-                
-                # Directly access the user's account
-                account = Account.objects.get(user=user)  # Using get() since OneToOneField guarantees uniqueness
-                
-                # Similarly fetch the Wallet, Category, Budget, and Goal
-                # Ensure these models are linked to the User directly or indirectly to enforce access control
+            
+                account = Account.objects.get(user=user)  
                 wallet = Wallet.objects.filter(account=account, name=wallet_name).first()
                 category = Category.objects.filter(account=account, name=category_name).first()
                 budget = Budget.objects.filter(account=account, name=budget_name).first()
