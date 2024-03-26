@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Import Transactions{% endblock %}
+
+{% block content %}
+<div class="container mx-auto mt-8 p-6 bg-gray-800 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-white mb-4">Import Transactions</h2>
+    <p class="text-gray-400 mb-6">Please upload a CSV file with your transactions.</p>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="flex flex-col mb-4">
+                <label class="text-gray-400 mb-2" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-input mt-1 block w-full rounded-md bg-gray-900 border-transparent focus:border-gray-500 focus:bg-gray-800 focus:ring-0' }}
+                {% if field.help_text %}
+                    <small class="text-gray-500">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Upload
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -32,6 +32,9 @@ class Budget(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        unique_together = ('account', 'name')
 
     def calculate_end_date(self):
         if self.period == 'daily':

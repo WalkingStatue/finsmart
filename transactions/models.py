@@ -16,6 +16,9 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.account.user.username}"
+    
+    class Meta:
+        unique_together = ('account', 'name')
 
 class Category(models.Model):
     name = models.CharField(max_length=255)

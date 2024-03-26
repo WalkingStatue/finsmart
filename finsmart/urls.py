@@ -25,6 +25,7 @@ from goals import urls as goal_urls
 from dashboard import urls as dashboard_urls
 from analysis import urls as analysis_urls
 from export import urls as export_urls
+from import_transactions import urls as import_urls
 from django.conf import settings
 
 
@@ -37,5 +38,6 @@ urlpatterns = [
     path("",include(dashboard_urls,namespace="dashboard")),
     path("analysis/",include(analysis_urls,namespace="analysis")),
     path("export/",include(export_urls,namespace="export")),
+    path("import/",include(import_urls,namespace="import")),
     path("", include("allauth.urls")),
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

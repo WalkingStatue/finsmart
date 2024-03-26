@@ -33,5 +33,8 @@ class Goal(models.Model):
         if self.amount_earned > self.total_goal:
             return 100
         return max(0, percentage)
+    
+    class Meta:
+        unique_together = ('account', 'name')
 
 
