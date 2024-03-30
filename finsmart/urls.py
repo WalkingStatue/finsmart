@@ -27,6 +27,7 @@ from analysis import urls as analysis_urls
 from export import urls as export_urls
 from import_transactions import urls as import_urls
 from django.conf import settings
+from .views import LandingPageView
 
 
 urlpatterns = [
@@ -39,5 +40,6 @@ urlpatterns = [
     path("analysis/",include(analysis_urls,namespace="analysis")),
     path("export/",include(export_urls,namespace="export")),
     path("import/",include(import_urls,namespace="import")),
+    path('landing/', LandingPageView.as_view(), name='landing_page'),
     path("", include("allauth.urls")),
 ] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

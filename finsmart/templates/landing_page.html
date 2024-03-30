@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}FinSmart - Simplify Your Financial Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="text-center py-16 bg-gray-200">
+    <div class="container mx-auto">
+        <h1 class="text-5xl font-bold">Simplify Your Financial Management</h1>
+        <p class="text-xl mt-4">Take control of your finances with ease and confidence.</p>
+        <a href="{% url 'account_signup' %}" class="mt-8 inline-block bg-blue-500 text-white px-8 py-4 rounded">Get Started</a>
+        <a href="{% url 'account_login' %}" class="mt-8 inline-block bg-blue-500 text-white px-8 py-4 rounded">Already Have a Account?</a>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-16">
+    <div class="container mx-auto text-center">
+        <h2 class="text-4xl font-bold">Why FinSmart?</h2>
+        <p class="mt-4">FinSmart provides you with the tools to manage your finances efficiently, offering insights and analytics to help you make informed decisions.</p>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-gray-100">
+    <div class="container mx-auto">
+        <h2 class="text-4xl font-bold text-center">Our Features</h2>
+        <div class="flex flex-wrap mt-8">
+            <!-- Feature 1 -->
+            <div class="w-full md:w-1/3 text-center p-4">
+                <h3 class="font-bold text-xl">Budget Planning</h3>
+                <p>Plan and track your budget to achieve your financial goals faster.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="w-full md:w-1/3 text-center p-4">
+                <h3 class="font-bold text-xl">Expense Tracking</h3>
+                <p>Keep track of your spending patterns and identify areas for savings.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="w-full md:w-1/3 text-center p-4">
+                <h3 class="font-bold text-xl">Investment Insights</h3>
+                <p>Get personalized insights to make smarter investment choices.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
