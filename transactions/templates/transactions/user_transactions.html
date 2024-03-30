@@ -5,17 +5,30 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-   <!-- Messages Display -->
-   {% if messages %}
-   <ul class="messages">
-     {% for message in messages %}
-       <li class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-         {{ message }}
-       </li>
-     {% endfor %}
-   </ul>
-   {% endif %}
-
+  {% if messages %}
+  <div class="flex flex-col space-y-4 p-4">
+      {% for message in messages %}
+          {% if 'warning' in message.tags %}
+              <!-- Warning messages in red -->
+              <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                  <p class="font-bold">Warning</p>
+                  <p>{{ message }}</p>
+              </div>
+          {% elif 'success' in message.tags %}
+              <!-- Success messages in green -->
+              <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+                  <p class="font-bold">Success</p>
+                  <p>{{ message }}</p>
+              </div>
+          {% else %}
+              <!-- Default message styling for other types -->
+              <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+                  <p>{{ message }}</p>
+              </div>
+          {% endif %}
+      {% endfor %}
+  </div>
+{% endif %}
   <!-- Wallets Display -->
   <div class="flex flex-wrap gap-4 mb-6 mt-2">
     {% for wallet in wallets %}

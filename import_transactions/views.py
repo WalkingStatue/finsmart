@@ -25,36 +25,47 @@ class ImportTransactionsView(View):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['csv_file']
-            self.process_csv(file, request.user)
-            messages.success(request, "Transactions imported successfully!")
-            return redirect(reverse_lazy('transactions:user_transactions'))  # Adjust as needed
-        return render(request, self.template_name, {'form': form})
+            self.process_csv(request, file, self.request.user)
+            messages.success(request, "Transactions imported successfully!", extra_tags='import_transactions')
+            return redirect(reverse_lazy('transactions:user_transactions')) 
+        else:
+            return render(request, self.template_name, {'form': form})
 
-    def process_csv(self, file, user):
+    def process_csv(self,request,file, user):
         reader = csv.DictReader(file.read().decode('utf-8').splitlines())
-        with db_transaction.atomic():  # Ensures atomicity of the batch operation
+        skipped_records = 0 
+        
+        with db_transaction.atomic():
             for row in reader:
                 wallet_name = row.get('Wallet')
+                transaction_type = row.get('Transaction Type')
+                transaction_date_str = row.get('Transaction Date')
+                
+               
+                if not wallet_name or not transaction_type or not transaction_date_str:
+                    skipped_records += 1
+                    continue
+                
+                transaction_date = parse_datetime(transaction_date_str) or timezone.now()
+                
+                account = Account.objects.get(user=user)  
+                wallet = Wallet.objects.filter(account=account, name=wallet_name).first()
+                
+                if not wallet:
+                    skipped_records += 1
+                    continue
+                
                 category_name = row.get('Category')
                 budget_name = row.get('Budget')
                 goal_name = row.get('Goal')
-            
-                account = Account.objects.get(user=user)  
-                wallet = Wallet.objects.filter(account=account, name=wallet_name).first()
                 category = Category.objects.filter(account=account, name=category_name).first()
                 budget = Budget.objects.filter(account=account, name=budget_name).first()
                 goal = Goal.objects.filter(account=account, name=goal_name).first()
-                
-                if not wallet:
-                    # Handle missing wallet appropriately, e.g., skip or log error
-                    continue
-                
-                transaction_date = parse_datetime(row.get('Transaction Date')) or timezone.now()
-                
+                    
                 Transaction.objects.create(
                     account=account,
                     wallet=wallet,
-                    transaction_type=row.get('Transaction Type').lower(),
+                    transaction_type=transaction_type.lower(),
                     amount=row.get('Amount'),
                     description=row.get('Description'),
                     category=category,
@@ -62,4 +73,6 @@ class ImportTransactionsView(View):
                     budget=budget,
                     goal=goal,
                 )
-
+        if skipped_records > 0:
+            messages.warning(request, f"{skipped_records} records were skipped due to missing required fields.", extra_tags='import_transactions')
+            print(f"{skipped_records} records were skipped due to missing wallet, transaction type, or transaction date.")
