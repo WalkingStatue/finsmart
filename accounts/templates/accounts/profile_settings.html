@@ -27,7 +27,7 @@
     <div class="ml-8 flex-grow">
       <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
         <div class="tab-content" id="profile-content">
-          {% include "accounts/profile_update.html" %}
+          {% include 'accounts/profile_update.html' %}
         </div>
         <div class="tab-content hidden" id="wallets-content">
           {% include "wallets/wallet_settings.html" %}
@@ -39,6 +39,8 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block javascript%}
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const tabs = document.querySelectorAll("[data-tab]");
@@ -81,5 +83,4 @@
     tabs[0].click();
   });
 </script>
-
 {% endblock %}

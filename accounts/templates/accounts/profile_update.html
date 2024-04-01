@@ -1,0 +1,79 @@
+{% load widget_tweaks %}
+{% if messages %}
+<div class="flex flex-col space-y-4 p-4">
+    {% for message in messages %}
+        {% if 'warning' in message.tags %}
+            <!-- Warning messages in red -->
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                <p class="font-bold">Warning</p>
+                <p>{{ message }}</p>
+            </div>
+        {% elif 'success' in message.tags %}
+            <!-- Success messages in green -->
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+                <p class="font-bold">Success</p>
+                <p>{{ message }}</p>
+            </div>
+        {% else %}
+            <!-- Default message styling for other types -->
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+<div class="flex items-center justify-center py-4 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-lg w-full space-y-8 bg-gray-700 p-10 rounded-lg shadow-2xl">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
+                Update Your Profile
+            </h2>
+        </div>
+        <form method="POST" action="{% url 'accounts:profile-update' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="rounded-md shadow-sm space-y-4">
+                {% for field in u_form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">{{ field.label }}</label>
+                    {{ field|add_class:"appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-gray-800 text-white" }}
+                    {% if field.help_text %}
+                    <p class="mt-2 text-sm text-gray-400">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                {% for field in a_form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">{{ field.label }}</label>
+                    <div class="text-white">
+                        {% if field.value %}
+                            Currently: <a href="{{ field.value.url }}" target="_blank" class="text-blue-400 hover:text-blue-600">{{ field.value }}</a>
+                            <label for="{{ field.auto_id }}_clear" class="text-sm font-medium text-gray-300 ml-2">Clear</label>
+                            <input type="checkbox" name="{{ field.html_name }}-clear" id="{{ field.auto_id }}_clear" class="ml-1 align-text-bottom" />
+                        {% endif %}
+                    </div>
+                    {% if field.field.widget.input_type != 'file' %}
+                        {{ field|add_class:"appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-gray-700 text-white" }}   
+                    {% else %}
+                        <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-white hover:file:bg-gray-500">
+                    {% endif %}
+                    {% if field.help_text %}
+                    <p class="mt-2 text-sm text-gray-400">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Update
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
