@@ -1,0 +1,61 @@
+<div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+  <h2 class="text-3xl font-semibold text-white mb-6">Categories</h2>
+  <a
+    href="{% url 'transactions:add_category' %}"
+    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6 inline-block text-center transition duration-300 ease-in-out"
+    >Add Category</a
+  >
+  <ul class="space-y-4">
+    {% for category in categories %}
+    <li
+      class="flex justify-between items-center bg-gray-800 p-4 rounded-md transition duration-300 ease-in-out hover:bg-gray-700"
+    >
+      <span class="text-white font-medium">{{ category.name }}</span>
+      <div>
+        <a
+          href="{% url 'transactions:update_category' pk=category.pk %}"
+          class="text-sm bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out mr-2 inline-flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-4 h-4 mr-1"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-1.688 1.688m-2.651-2.652l-8.168 8.17m0 0L6.75 14.25l2.475-.525m-2.475.525l.525 2.475 8.168-8.169m0 0l2.651-2.651M3 21h18"
+            />
+          </svg>
+          Edit
+        </a>
+        <a
+          href="{% url 'transactions:delete_category' pk=category.pk %}"
+          class="text-sm bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out inline-flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-4 h-4 mr-1"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.166L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.426m-11 .426c.342-.059.682-.114 1.022-.166m0 0a48.257 48.257 0 013.456-.426M6 5.75V4.5A1.5 1.5 0 017.5 3h9A1.5 1.5 0 0118 4.5v1.25m-12 0h12"
+            />
+          </svg>
+          Delete
+        </a>
+      </div>
+    </li>
+    {% empty %}
+    <li class="text-white text-center">No categories found.</li>
+    {% endfor %}
+  </ul>
+</div>
