@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'analysis',
     'export',
     'import_transactions',
+    'django_crontab',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -189,3 +190,7 @@ ACCOUNT_FORMS = {
 
 USE_TZ = True
 TIME_ZONE = 'Asia/Kolkata'
+
+CRONJOBS = [
+    ('59 23 * * *', 'django.core.management.call_command', ['check_budgets'], {})
+]

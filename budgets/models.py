@@ -23,6 +23,8 @@ class Budget(models.Model):
     start_date = models.DateField(default=timezone.now)
     end_date = models.DateField(null=True, blank=True)  # Nullable for custom period
     period = models.CharField(max_length=10, choices=PERIOD_CHOICES, default='monthly')
+    is_repetitive = models.BooleanField(default=False)
+
 
     def save(self, *args, **kwargs):
         if not self.end_date or self.period != 'custom':
@@ -64,3 +66,14 @@ class Budget(models.Model):
             return 0  # Prevent division by zero
         percentage = (self.amount_remaining / self.total_budget) * 100
         return max(0, percentage)  # Ensure percentage is not negative
+
+    def should_reset(self):
+        return self.is_repetitive
+
+    def reset_budget(self):
+        # Logic to reset the budget
+        self.start_date = timezone.now().date()
+        self.end_date = self.calculate_end_date()
+        self.amount_spent = Decimal('0.00')
+        self.amount_remaining = self.total_budget
+        self.save()
