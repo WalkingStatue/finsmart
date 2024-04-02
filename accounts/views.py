@@ -52,7 +52,6 @@ class ProfileSettingsView(LoginRequiredMixin, TemplateView):
         context['wallets'] = Wallet.objects.filter(account__user=user)
         context['categories'] = Category.objects.filter(account__user=user)
         
-        # Add the forms to the context
         context['u_form'] = UserUpdateForm(instance=user)
         context['a_form'] = AccountUpdateForm(instance=user.account)
         
