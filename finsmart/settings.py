@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -200,6 +199,11 @@ JAZZMIN_SETTINGS = {
     "site_title": "Finsmart",
     "site_header": "Finsmart",
     "site_brand": "Finsmart",
+    "site_logo": "image/logo-160x160.png",
+    "login_logo": "image/logo-160x160.png",
+    "login_logo_dark": "image/logo-160x160.png",
+    "site_logo_classes": "img-circle",
+    "site_icon": "image/logo-32x32.ico",
     "welcome_sign": "Welcome to Finsmart!",
     "order_with_respect_to": [
         "auth",  # This represents the "Authentication and Authorization" section
