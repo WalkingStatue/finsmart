@@ -10,25 +10,22 @@ from .models import Transaction, Wallet, Category
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.http import Http404
-  # Assuming you have a Wallet model
 
 class UserTransactionsView(LoginRequiredMixin, ListView):
     model = Transaction
     template_name = 'transactions/user_transactions.html'
+    paginate_by = 20  # Display 20 transactions per page
 
     def get_queryset(self):
-        queryset = Transaction.objects.filter(account__user=self.request.user).order_by('-transaction_date')
+        queryset = super().get_queryset().filter(account__user=self.request.user).order_by('-transaction_date')
         wallet_pk = self.kwargs.get('pk')
-        # Get the 'start_date' and 'end_date' from the request's GET parameters
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
         
         if start_date and end_date:
-            # Filter the queryset based on the provided date range
             queryset = queryset.filter(transaction_date__range=(start_date, end_date))
         
         if wallet_pk:
-            # Ensure the wallet belongs to the logged-in user
             wallet = get_object_or_404(Wallet, pk=wallet_pk, account__user=self.request.user)
             queryset = queryset.filter(wallet=wallet)
         
@@ -36,11 +33,12 @@ class UserTransactionsView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['date_range_form'] = DateRangeForm(self.request.GET or None)  # Pass initial data to the form
+        context['date_range_form'] = DateRangeForm(self.request.GET or None)
         context['wallets'] = Wallet.objects.filter(account__user=self.request.user)
         context['selected_wallet_pk'] = self.kwargs.get('pk', None)
         context['selected_wallet_id'] = self.request.GET.get('pk', None)
         return context
+
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction

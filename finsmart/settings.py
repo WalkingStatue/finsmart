@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -194,3 +195,40 @@ TIME_ZONE = 'Asia/Kolkata'
 CRONJOBS = [
     ('59 23 * * *', 'django.core.management.call_command', ['check_budgets'], {})
 ]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Finsmart",
+    "site_header": "Finsmart",
+    "site_brand": "Finsmart",
+    "welcome_sign": "Welcome to Finsmart!",
+    "order_with_respect_to": [
+        "auth",  # This represents the "Authentication and Authorization" section
+        "Accounts",  # The Account model within the "accounts" app
+        "Account",  # The EmailAddress model within the "allauth" app
+        "transactions",  # The "Transactions" section
+        "budgets",  # The "Budgets" section
+        "goals",  # The "Goals" section
+        "socialaccount",  # The "Social Accounts" section
+    ],
+     "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "accounts.account": "fas fa-id-badge",
+        "account.emailaddress": "fas fa-envelope",
+        "transactions.Transaction": "fas fa-money-check-alt",
+        "transactions.Wallet": "fas fa-wallet",
+        "transactions.Category": "fas fa-list-alt",
+        "budgets.Budget": "fas fa-piggy-bank",
+        "goals.Goal": "fas fa-bullseye",
+        "socialaccount.SocialAccount": "fas fa-share-alt",
+    },
+    "hide_apps": ["SITES", "socialaccount", "socialaccount.providers"],
+
+}
+JAZZMIN_UI_TWEAKS = {
+    "theme": "minty",
+    #"dark_mode_theme": "darkly",
+}
+
+JAZZMIN_SETTINGS["show_ui_builder"] = True
