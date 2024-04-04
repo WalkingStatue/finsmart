@@ -65,11 +65,13 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'finsmart.middleware.LandingPageMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'accounts.middleware.ProfileCompletionMiddleware',
 ]
+
 
 ROOT_URLCONF = 'finsmart.urls'
 
