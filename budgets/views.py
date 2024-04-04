@@ -39,7 +39,6 @@ class BudgetListView(LoginRequiredMixin, ListView):
             budget.transactions_list = budget.transactions.all()
         return queryset
 
-
 class BudgetCreateView(LoginRequiredMixin, CreateView):
     model = Budget
     form_class = BudgetForm  # Use this if you defined a custom form

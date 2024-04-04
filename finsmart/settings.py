@@ -232,7 +232,7 @@ JAZZMIN_SETTINGS = {
 }
 JAZZMIN_UI_TWEAKS = {
     "theme": "minty",
-    #"dark_mode_theme": "darkly",
+    "dark_mode_theme": "darkly",
 }
 
 JAZZMIN_SETTINGS["show_ui_builder"] = True

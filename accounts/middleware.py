@@ -9,8 +9,8 @@ class ProfileCompletionMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated and not request.path.startswith('/accounts/'):
             accounts, created = Account.objects.get_or_create(user=request.user)
-            if not accounts.profile_completed and not request.path.startswith(reverse('account:profile_update')):
-                return redirect('account:profile_update')
+            if not accounts.profile_completed and not request.path.startswith(reverse('account:profile_complete')):
+                return redirect('account:profile_complete')
         return self.get_response(request)
         return response
 

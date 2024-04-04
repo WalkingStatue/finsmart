@@ -14,7 +14,7 @@ class ProfileCompleteView(LoginRequiredMixin, TemplateResponseMixin, View):
     template_name = 'accounts/complete_profile.html'
     user_form_class = UserForm
     account_form_class = AccountForm
-    success_url = reverse_lazy('account:home')  # Adjust as needed
+    success_url = reverse_lazy('dashboard:user_dashboard')  # Adjust as needed
 
     def get(self, request, *args, **kwargs):
         user_form = self.user_form_class(instance=request.user)
