@@ -11,3 +11,10 @@ class BudgetForm(forms.ModelForm):
             # You might add more widgets for other fields as needed, for styling or functionality purposes.
         }
 
+    def clean_total_budget(self):
+        total_budget = self.cleaned_data.get('total_budget')
+        if total_budget is not None:
+            if total_budget <= 0:
+                self.add_error('total_budget', 'Total budget must be greater than 0.')
+        return total_budget
+

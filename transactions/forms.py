@@ -1,5 +1,6 @@
 from django import forms
 from .models import Category,Wallet,Transaction
+from django.core.exceptions import ValidationError
 from budgets.models import Budget
 from goals.models import Goal
 
@@ -43,11 +44,33 @@ class TransactionForm(forms.ModelForm):
         wallet = cleaned_data.get('wallet')
         transaction_type = cleaned_data.get('transaction_type')
         amount = cleaned_data.get('amount')
+        budget = cleaned_data.get('budget')
+        goal = cleaned_data.get('goal')
 
-        if transaction_type == 'debit' and wallet.balance < amount:
+        if goal and amount:
+            # Directly use the amount_remaining field to check if transaction exceeds the goal
+            if goal.amount_earned - amount < 0:
+                raise ValidationError({
+                    'amount': 'This goal is achieved. Please create a new goal'
+                })
+
+        if budget and amount:
+            # Directly use the amount_remaining field to check if transaction exceeds the budget
+            if budget.amount_remaining - amount < 0:
+                raise ValidationError({
+                    'amount': 'This transaction cannot be completed as it exceeds the budget available.'
+                })
+
+        # Check if the transaction amount is negative
+        if amount is not None and amount < 0:
+            self.add_error('amount', 'The amount cannot be negative.')
+
+        # Existing check for insufficient funds
+        if transaction_type == 'debit' and wallet and wallet.balance < amount:
             self.add_error('amount', 'Insufficient funds in wallet.')
 
         return cleaned_data
+
 
 class DateRangeForm(forms.Form):
     start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))

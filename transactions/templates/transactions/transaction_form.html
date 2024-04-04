@@ -10,6 +10,22 @@
   <form method="post" action="" class="space-y-6">
     {% csrf_token %}
     <!-- Amount Field -->
+    {% if form.non_field_errors %}
+    <div class="alert-error rounded-md bg-red-700 p-4 mt-4">
+        <div class="flex">
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-white">There was a problem.</h3>
+                <div class="mt-2 text-sm text-red-200">
+                    <ul role="list" class="list-disc pl-5 space-y-1">
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="sm:col-span-6">
       <label for="id_amount" class="block text-sm font-medium text-gray-300"
         >Amount</label
@@ -22,6 +38,13 @@
         value="{{ form.fields.amount.value }}"
         class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-600 bg-gray-700 text-white rounded-md"
       />
+      {% if form.amount.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.amount.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Description Field -->
@@ -39,6 +62,13 @@
         value="{{ form.fields.description.value }}"
         class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-600 bg-gray-700 text-white rounded-md"
       />
+      {% if form.description.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.description.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Wallet Tabbed Interface -->
@@ -62,6 +92,13 @@
         name="wallet"
         value="{{ form.fields.wallet.value }}"
       />
+      {% if form.wallet.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.wallet.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Transaction Type Tabbed Interface -->
@@ -89,6 +126,13 @@
         name="transaction_type"
         value="{{ form.fields.transaction_type.value }}"
       />
+      {% if form.transaction_type.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.transaction_type.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Budget Tabbed Interface -->
@@ -112,6 +156,13 @@
         name="budget"
         value="{{ form.fields.budget.value }}"
       />
+      {% if form.budget.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.budget.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Goal Tabbed Interface -->
@@ -135,6 +186,13 @@
         name="goal"
         value="{{ form.fields.goal.value }}"
       />
+      {% if form.goal.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.goal.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Category Tabbed Interface -->
@@ -159,6 +217,13 @@ Adjusted spacing -->
         name="category"
         value="{{ form.fields.category.value }}"
       />
+      {% if form.category.errors %}
+      <div class="text-red-600 mt-2 text-sm">
+        {% for error in form.category.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <!-- Submit and Cancel buttons -->
@@ -176,23 +241,6 @@ Adjusted spacing -->
         Save
       </button>
     </div>
-
-    {% if form.non_field_errors %}
-    <div class="alert-error rounded-md bg-red-700 p-4 mt-4">
-      <div class="flex">
-        <div class="ml-3">
-          <h3 class="text-sm font-medium text-white">There was a problem.</h3>
-          <div class="mt-2 text-sm text-red-200">
-            <ul role="list" class="list-disc pl-5 space-y-1">
-              {% for error in form.non_field_errors %}
-              <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endif %}
   </form>
 </div>
 
