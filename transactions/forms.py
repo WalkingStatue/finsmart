@@ -8,8 +8,6 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ['name']
 
-
-
 class WalletForm(forms.ModelForm):
     class Meta:
         model = Wallet

@@ -39,7 +39,6 @@ class UserTransactionsView(LoginRequiredMixin, ListView):
         context['selected_wallet_id'] = self.request.GET.get('pk', None)
         return context
 
-
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
     form_class = TransactionForm
