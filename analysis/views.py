@@ -17,14 +17,13 @@ class CashFlowChartView(LoginRequiredMixin,View):
         user = request.user
         end_date = now()
 
-        # Truncate and filter based on the date range
         if date_range == 'weekly':
             trunc_date = TruncWeek('transaction_date')
             start_date = end_date - timedelta(weeks=1)
         elif date_range == 'monthly':
             trunc_date = TruncMonth('transaction_date')
-            start_date = end_date - timedelta(days=30)  # Roughly a month
-        else:  # daily
+            start_date = end_date - timedelta(days=30)  
+        else:
             trunc_date = TruncDay('transaction_date')
             start_date = end_date - timedelta(days=1)
         
@@ -75,10 +74,10 @@ class SpendingTrendsView(LoginRequiredMixin, View):
             categories = Category.objects.filter(account__user=self.request.user, id__in=category_ids.split(','))
         else:
             categories = Category.objects.filter(account__user=self.request.user)
-             # Define the truncation and filtering based on the time period
+             
         if time_period == 'weekly':
             trunc_date = TruncWeek('transaction_date')
-        else:  # Default to monthly
+        else:
             trunc_date = TruncMonth('transaction_date')
 
         trends_data = []
@@ -88,7 +87,6 @@ class SpendingTrendsView(LoginRequiredMixin, View):
                 category=category
             ).annotate(period=trunc_date).values('period').annotate(total=Sum('amount')).order_by('period')
 
-            # Convert QuerySet to a list of dictionaries
             data = [{'period': entry['period'], 'total': entry['total']} for entry in transactions]
             trends_data.append({
                 'category': category.name,
@@ -108,19 +106,18 @@ class Budget_Utilization(LoginRequiredMixin, View):
             transactions = Transaction.objects.filter(
                 account=budget.account,
                 transaction_date__gte=budget.start_date,
-                transaction_date__lte=budget.end_date or timezone.now()
+                transaction_date__lte=budget.end_date or now()
             )
             
             total_spent = transactions.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-            
-            # If total_budget is 0, set utilization to 0 to avoid division by zero
-            utilization = (budget.amount_spent / budget.total_budget * 100) if budget.total_budget else Decimal('0.00')
+            utilization = (total_spent / budget.total_budget * 100) if budget.total_budget else Decimal('0.00')
+
             
             budget_data.append({
                 'name': budget.name,
                 'total_budget': str(budget.total_budget),
                 'amount_spent': str(budget.amount_spent),
-                'utilization': str(utilization)  # Convert Decimal to string for JSON serialization
+                'utilization': f"{utilization:.2f}%"
             })
 
         return JsonResponse({'budget_data': budget_data})
