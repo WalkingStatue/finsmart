@@ -4,12 +4,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
+from .models import Transaction, Wallet, Category
 from django.views.generic.list import ListView
 from django.shortcuts import get_object_or_404
-from .models import Transaction, Wallet, Category
+from django.core.serializers import serialize
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.http import Http404
+import json
+from budgets.models import Budget
+from goals.models import Goal
 
 class UserTransactionsView(LoginRequiredMixin, ListView):
     model = Transaction
@@ -38,7 +42,6 @@ class UserTransactionsView(LoginRequiredMixin, ListView):
         context['selected_wallet_pk'] = self.kwargs.get('pk', None)
         context['selected_wallet_id'] = self.request.GET.get('pk', None)
         return context
-
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
     form_class = TransactionForm
@@ -46,29 +49,50 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('transactions:user_transactions')  # Adjust with the correct URL name
 
     def form_valid(self, form):
-        form.instance.account = self.request.user.account  # Set the account automatically
-        return super().form_valid(form)
+        form.instance.account = self.request.user.account  # Set the account before saving
+        response = super().form_valid(form)  # This saves the Transaction
+        transaction = form.instance
+        # If your budget and goal logic requires the transaction to be saved first, this is correctly placed
+        if transaction.budget:
+            transaction.budget.update_amount_spent()
+            transaction.budget.save()
+        if transaction.goal:
+            transaction.goal.update_amount_earned()
+            transaction.goal.save()
+        return response
         
     
     def get_form_kwargs(self):
         kwargs = super(TransactionCreateView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-
 class TransactionUpdateView(LoginRequiredMixin, UpdateView):
     model = Transaction
     form_class = TransactionForm
     template_name = 'transactions/transaction_form.html'
 
     def get_queryset(self):
-        """Ensure the user can only update their own transactions."""
-        queryset = super().get_queryset()
-        return queryset.filter(account__user=self.request.user)
+         return super().get_queryset().filter(account__user=self.request.user)
+    
+    def get_form_kwargs(self):
+        kwargs = super(TransactionUpdateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user 
+        return kwargs
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        transaction = form.instance 
+        if transaction.budget:
+            transaction.budget.update_amount_spent()  
+            transaction.budget.save()
+        if transaction.goal:
+            transaction.goal.update_amount_earned() 
+            transaction.goal.save()
+
+        return response
 
     def get_success_url(self):
-        """Redirect to the transactions list page after a successful update."""
-        return reverse_lazy('transactions:user_transactions')
-
+        return reverse_lazy('transactions:user_transactions') 
 class TransactionDeleteView(LoginRequiredMixin, DeleteView):
     model = Transaction
     template_name = 'transactions/transaction_confirm_delete.html'

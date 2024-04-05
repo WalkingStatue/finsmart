@@ -27,18 +27,6 @@ class TransactionForm(forms.ModelForm):
             self.fields['budget'].queryset = Budget.objects.filter(account__user=user)
             self.fields['goal'].queryset = Goal.objects.filter(account__user=user)
 
-    def form_valid(self, form):
-        #form.instance.user = self.request.user  # Assuming the Transaction model links directly to the Django User
-        #form.instance.account = self.request.user.account  # If your Transaction model links to a custom Account model
-        response = super().form_valid(form)  # This saves the Transaction
-        transaction = form.instance
-        if transaction.budget:
-            transaction.budget.update_amount_spent()  # Make sure your Budget model has this method
-            transaction.budget.save()
-        if transaction.goal:
-            transaction.goal.update_amount_earned()  # Make sure your Goal model has this method
-            transaction.goal.save()
-        return response
     def clean(self):
         cleaned_data = super().clean()
         wallet = cleaned_data.get('wallet')
