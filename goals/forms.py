@@ -16,4 +16,12 @@ class GoalForm(forms.ModelForm):
             if total_goal <= 0:
                 self.add_error('total_goal', 'Total goal must be greater than 0.')
         return total_goal
+    
+    def clean_end_date(self):
+        target_date = self.cleaned_data.get('target_date')
+        
+        if target_date is not None:
+            if target_date < timezone.now().date():
+                raise forms.ValidationError("End date cannot be before today's date.")
+        return target_date
 

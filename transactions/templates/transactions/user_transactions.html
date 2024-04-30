@@ -69,6 +69,13 @@
         </div>
       </div>
     </form>
+    {% if date_range_form.non_field_errors %}
+    <div class="text-red-600 mt-2 text-sm">
+      {% for error in date_range_form.non_field_errors %}
+        <p>{{ error }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
 
   <!-- Transactions Table -->

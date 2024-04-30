@@ -1,14 +1,13 @@
 from django import forms
+from django.utils import timezone
 from .models import Budget
 
 class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
-        fields = ['name', 'total_budget', 'amount_spent','end_date', 'period', 'is_repetitive']  # Include 'is_repetitive' and optionally 'start_date'
+        fields = ['name', 'total_budget', 'amount_spent','end_date', 'period', 'is_repetitive']
         widgets = {
-            #'start_date': forms.widgets.DateInput(attrs={'type': 'date'}),  # Make sure to include 'start_date' if you're allowing users to set it
             'end_date': forms.widgets.DateInput(attrs={'type': 'date'}),
-            # You might add more widgets for other fields as needed, for styling or functionality purposes.
         }
 
     def clean_total_budget(self):
@@ -18,3 +17,9 @@ class BudgetForm(forms.ModelForm):
                 self.add_error('total_budget', 'Total budget must be greater than 0.')
         return total_budget
 
+    def clean_end_date(self):
+        end_date = self.cleaned_data.get('end_date')
+        if end_date is not None:
+            if end_date < timezone.now().date():
+                raise forms.ValidationError("End date cannot be before today's date.")
+        return end_date
